@@ -17,7 +17,7 @@ kinematics: main.o joint.o
 	$(CC) $(CFLAGS) -o kinematics main.o joint.o $(LDFLAGS) $(EIGEN_INCLUDE)
 
 main.o: main.cpp joint.h
-	$(CC) $(CFLAGS) -c main.cpp 
+	$(CC) $(CFLAGS) -c main.cpp $(EIGEN_INCLUDE)
 
 joint.o: joint.cpp joint.h
 	$(CC) $(CFLAGS) -c joint.cpp $(EIGEN_INCLUDE)
