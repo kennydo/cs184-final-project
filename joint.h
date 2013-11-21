@@ -23,23 +23,13 @@ public:
 class Link
 {
 private:
+    Link *parent_;
     float length_;
     Joint *j0_;
     Joint *j1_;
 public:
-    Link(float length, Joint *j0, Joint *j1) : length_(length), j0_(j0), j1_(j1) {}
-};
-
-class Body
-{
-private:
-    vector<Joint*> joints_;
-    vector<Link*> links_;
-public:
-    Body() {}
-
-    void addJoint(Joint *joint) { joints_.push_back(joint); }
-    void addLink(Link *link) { links_.push_back(link); }
+    Link(Link *parent, float length, Joint *j0, Joint *j1)
+        : length_(length), j0_(j0), j1_(j1) {}
 };
 
 #endif
