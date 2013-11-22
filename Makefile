@@ -12,11 +12,9 @@ else
 endif
 	
 RM = /bin/rm -f 
-CPP_FILES = main.cpp joint.cpp window.cpp
+CPP_FILES = main.cpp joint.cpp window.cpp scene.cpp
 
-all: kinematics 
-
-kinematics:
+all:
 	$(CC) $(CFLAGS) -o kinematics $(CPP_FILES) $(LDFLAGS) $(EIGEN_INCLUDE)
 
 clean: 

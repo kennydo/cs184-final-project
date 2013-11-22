@@ -9,13 +9,16 @@
 #include <stdio.h>
 #include "joint.h"
 #include "window.h"
+#include "scene.h"
 
 int main(int argc, char* argv[])
 {
+    Scene* scene = new Scene();
+
     glutInit(&argc, argv);
 
     // set up our Window object
-    Window::init(800, 640, "CS 184 Kinematics Project", 0, 0);
+    Window::init(800, 640, "CS 184 Kinematics Project", 0, 0, scene);
 
     // glut only takes static functions,
     // so I had to change the Window's methods to be static

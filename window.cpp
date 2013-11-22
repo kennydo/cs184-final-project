@@ -3,11 +3,13 @@
 int Window::width = 0;
 int Window::height = 0;
 std::string Window::title = "";
+Scene* Window::scene;
 
-void Window::init(int w, int h, std::string t, int pos_x, int pos_y){
+void Window::init(int w, int h, std::string t, int pos_x, int pos_y, Scene* s){
     Window::width = w;
     Window::height = h;
     Window::title = t;
+    Window::scene = s;
 
     //This tells glut to use a double-buffered window with RGB channels
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
@@ -38,6 +40,9 @@ void Window::display(){
 
     // this is where the magic happens
     // it's time to draw polygons and stuff!
+
+    Window::scene->refreshCamera();
+    Window::scene->draw();
 
     glFlush();
     glutSwapBuffers();
