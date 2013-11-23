@@ -1,4 +1,5 @@
 #include "window.h"
+#include <cstdio>
 
 int Window::width = 0;
 int Window::height = 0;
@@ -31,6 +32,7 @@ void Window::init(int w, int h, std::string t, int pos_x, int pos_y, Scene* s){
 
     glutDisplayFunc(Window::display);
     glutReshapeFunc(Window::reshape);
+    glutKeyboardFunc(Window::keyboard);
     glutIdleFunc(Window::idle);
 }
 
@@ -59,4 +61,17 @@ void Window::idle(){
     // but we're not, so we don't care
 
     glutPostRedisplay();
+}
+
+void Window::keyboard(unsigned char key, int x, int y) {
+    switch(key) {
+        case '+':
+            printf("move joint clockwise\n");
+            scene->moveSkeleton(30);
+            break;
+        case '-':
+            printf("move joint counterclockwise\n");
+            scene->moveSkeleton(-30);
+            break;
+    }
 }

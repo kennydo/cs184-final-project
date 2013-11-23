@@ -15,6 +15,7 @@ class Window {
         static void reshape(int, int);
         static void idle();
         static void display();
+        static void keyboard(unsigned char, int, int);
 };
 
 #endif

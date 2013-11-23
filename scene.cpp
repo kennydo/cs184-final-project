@@ -1,7 +1,13 @@
 #include "scene.h"
+#include <cstdio>
 
 Scene::Scene(){
     // initialize variables
+    theta = 0;
+}
+
+void Scene::addRootJoint(Joint *j) {
+    root = j;
 }
 
 void Scene::refreshCamera(){
@@ -26,7 +32,8 @@ void Scene::refreshCamera(){
 }
 
 void Scene::draw(){
-    drawGrid(-10, 10, -10, 10, 1);
+    //drawGrid(-10, 10, -10, 10, 1);
+    drawSkeleton();
 }
 
 void Scene::drawGrid(float xMin, float xMax, float zMin, float zMax, float step){
@@ -47,3 +54,51 @@ void Scene::drawGrid(float xMin, float xMax, float zMin, float zMax, float step)
     }
 }
 
+void Scene::drawLink(Link link) {
+    Joint *j1 = link.getInnerJoint();
+    Joint *j2 = link.getOuterJoint();
+    
+    Vector3f p1 = j1->pos();
+    Vector3f p2 = j2->pos();
+    
+    //printf("vector 1 x: %f y: %f z: %f\n", p1.x(), p1.y(), p1.z());
+    //printf("vector 2 x: %f y: %f z: %f\n", p2.x(), p2.y(), p2.z());
+    
+    glColor3f(1.0, 1.0, 1.0);
+    glBegin(GL_LINES);
+    glVertex3f(p1.x(), p1.y(), p1.z());
+    glVertex3f(p2.x(), p2.y(), p2.z());
+    glEnd();
+    
+    vector<Link*> outerLinks = j2->getOuterLink();
+    
+    if ( outerLinks.size() > 0 ) {
+        for (unsigned int i = 0; i < outerLinks.size(); i++) {
+            drawLink(*outerLinks[i]);
+        }
+    }
+}
+
+void Scene::drawSkeleton() {
+    
+    vector<Link*> outerLinks = root->getOuterLink();
+    
+    if ( outerLinks.size() > 0 ) {
+        for (unsigned int i = 0; i < outerLinks.size(); i++) {
+            drawLink(*outerLinks[i]);
+        }
+    }
+    
+    //Kinematics::solveFK(L12, theta*3.14159/180);
+    
+    //drawLink(L12);
+    //drawLink(L23);
+    
+}
+
+void Scene::moveSkeleton(float f) {
+    theta += f*3.14159/180;
+    
+    vector<Link*> outerLinks = root->getOuterLink();
+    Kinematics::solveFK(*(outerLinks.front()), theta);
+}

@@ -8,26 +8,44 @@
 using namespace std;
 using namespace Eigen;
 
+class Link;
+
 class Joint
 {
 private:
     Vector3f pos_;
+    Link *l0_; //inner link
+    vector<Link*> l1_; //outer link(s)
+    
 public:
     Joint(Vector3f position) : pos_(position) {}
-    
-    virtual float angleBetween(Joint *other) = 0;
+
+    void addInnerLink(Link *inner) { l0_ = inner; }
+    void addOuterLink(Link *outer) { l1_.push_back(outer); }
 
     Vector3f pos() { return pos_; }
+    Link* getInnerLink() { return l0_; }
+    vector<Link*> getOuterLink() { return l1_; }
+    void moveJoint(Vector3f newPosition) { pos_ = newPosition; }
 };
 
 class Link
 {
 private:
-    float length_;
-    Joint *j0_;
-    Joint *j1_;
+    float length_, theta_;
+    Joint *j0_; //inner joint
+    Joint *j1_; //outer joint
 public:
-    Link(float length, Joint *j0, Joint *j1) : length_(length), j0_(j0), j1_(j1) {}
+    Link(float length, float theta) : length_(length), theta_(theta) {}
+    
+    void addInnerJoint(Joint *inner) { j0_ = inner; }
+    void addOuterJoint(Joint *outer) { j1_ = outer; }
+    
+    Joint* getInnerJoint() { return j0_; }
+    Joint* getOuterJoint() { return j1_; }
+    
+    float getLength() { return length_; }
+    float getAngle() { return theta_; }
 };
 
 class Body

@@ -8,12 +8,38 @@
 
 #include <stdio.h>
 #include "joint.h"
+#include "kinematics.h"
 #include "window.h"
 #include "scene.h"
+
+
 
 int main(int argc, char* argv[])
 {
     Scene* scene = new Scene();
+    
+    Vector3f p1 ( 0.0, 0.0, 0.0 );
+    Vector3f p2 ( 0.0, 4.0, 0.0 );
+    Vector3f p3 ( 4.0, 4.0, 0.0 );
+    
+    Joint j1 = Joint(p1);
+    Joint j2 = Joint(p2);
+    Joint j3 = Joint(p3);
+    
+    Link L12 = Link(4, 0);
+    Link L23 = Link(4, 3.14159/2);
+
+    j1.addOuterLink(&L12);
+    j2.addInnerLink(&L12);
+    j2.addOuterLink(&L23);
+    j3.addInnerLink(&L23);
+    
+    L12.addInnerJoint(&j1);
+    L12.addOuterJoint(&j2);
+    L23.addInnerJoint(&j2);
+    L23.addOuterJoint(&j3);
+
+    scene->addRootJoint(&j1);
 
     glutInit(&argc, argv);
 
