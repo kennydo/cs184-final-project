@@ -1,5 +1,6 @@
 #include "kinematics.h"
 #include <cstdio>
+#include <cmath>
 
 /*
  * Given angle (in radians) of joint movement and link
@@ -29,4 +30,61 @@ void Kinematics::solveFK(Link link, float theta) {
         }
     }
 
+}
+
+// Helper for jacobian, sums angles of terms i to j
+float sumAngles(vector<float>* angles, unsigned int i, unsigned int j)
+{
+    float sum = 0.0f;
+    for(int u = i; u < j; u++) sum += (*angles)[u];
+    return sum;
+}
+
+vector<Vector3f> Kinematics::jacobian(Link *link)
+{
+    // Trace our way in, putting previous elements in the front.
+    vector<Link*> path;
+    vector<float> thetas;
+    vector<float> lengths;
+
+    path.insert(path.begin(), link);
+    thetas.insert(thetas.begin(), link->getAngle());
+    lengths.insert(lengths.begin(), link->getLength());
+
+    Joint* innerJoint = link->getInnerJoint();
+    Link* innerLink = innerJoint->getInnerLink();
+
+    while(innerLink != NULL)
+    {
+        path.insert(path.begin(), innerLink);
+        thetas.insert(thetas.begin(), innerLink->getAngle());
+        lengths.insert(lengths.begin(), innerLink->getLength());
+
+        innerJoint = innerLink->getInnerJoint();
+        innerLink = innerJoint->getInnerLink();
+    }
+
+    // Now that we have all the lengths and thetas
+    // Our matrix is of the form [dpn/dt1 dpn/dt2 ... dpn/dtn]
+    // Logic replicated from http://njoubert.com/teaching/cs184_fa08/section/sec13inversekinematicsSOL.pdf (p.4)
+    vector<Vector3f> toReturn;
+    unsigned int n = path.size();
+    for(unsigned int i = 0; i < n; i++)
+    {
+        // The ith column has n-i terms: 
+        Vector3f col;
+        for(unsigned int j = i; j < n; j++)
+        {
+            //l1 cos(θ1) + l2 cos(θ1 + θ2)+ l3 cos(θ1 + θ2 + θ3) 
+            float sumThetas = sumAngles(&thetas, 0, j+1);
+            col.x() += lengths[j] * cos(sumThetas);
+            col.y() -= lengths[j] * sin(sumThetas);
+        }
+        // For now, the z coordinate is zero.
+        col.z() = 0;
+
+        // Since we're working our way from dt1 to dtn we push_back
+        toReturn.push_back(col);
+    }
+    return toReturn;
 }
