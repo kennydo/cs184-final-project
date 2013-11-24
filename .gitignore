@@ -19,3 +19,6 @@ kinematics
 *~
 *.swp
 .swp
+
+# Mac OS X debug directories
+kinematics.dSYM/

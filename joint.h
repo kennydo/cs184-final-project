@@ -48,16 +48,4 @@ public:
     float getAngle() { return theta_; }
 };
 
-class Body
-{
-private:
-    vector<Joint*> joints_;
-    vector<Link*> links_;
-public:
-    Body() {}
-
-    void addJoint(Joint *joint) { joints_.push_back(joint); }
-    void addLink(Link *link) { links_.push_back(link); }
-};
-
 #endif
