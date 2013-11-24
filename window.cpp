@@ -73,5 +73,9 @@ void Window::keyboard(unsigned char key, int x, int y) {
             printf("move joint counterclockwise\n");
             scene->moveSkeleton(-30);
             break;
+        case ' ':
+            printf("quitting\n");
+            exit(0);
+            break;
     }
 }
