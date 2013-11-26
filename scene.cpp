@@ -32,7 +32,6 @@ void Scene::refreshCamera(){
 }
 
 void Scene::draw(){
-    //drawGrid(-10, 10, -10, 10, 1);
     drawSkeleton();
 }
 
@@ -80,19 +79,12 @@ void Scene::drawLink(Link link) {
 }
 
 void Scene::drawSkeleton() {
-    
     vector<Link*> outerLinks = root->getOuterLink();
-    
     if ( outerLinks.size() > 0 ) {
         for (unsigned int i = 0; i < outerLinks.size(); i++) {
             drawLink(*outerLinks[i]);
         }
     }
-    
-    //Kinematics::solveFK(L12, theta*3.14159/180);
-    
-    //drawLink(L12);
-    //drawLink(L23);
     
 }
 
