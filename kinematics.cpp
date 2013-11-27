@@ -59,10 +59,15 @@ void Kinematics::solveIK(Link *link, Vector3f delta) {
     // Compute the jacobian on this link.
     MatrixXf jacobian = Kinematics::jacobian(link);
     MatrixXf pinv;
-    // TODO: handle false
+    // TODO: handle false ie. the case where links <= 2
     pseudoInverse(jacobian, pinv);
     
-    // TODO: (hkothari) what else?
+    // TODO: (hkothari) newtons method as follows:
+    // d0 = pseudoInverse * delta
+    // calculate new point caused by d0
+    // calculate distance from goal of new point
+    //if distance descreased, take that step.
+    // otherwise halve theta.
 }
 
 // Helper for jacobian, sums angles of terms i to j
