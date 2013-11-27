@@ -1,7 +1,13 @@
-#include "kinematics.h"
 #include <cassert>
 #include <cstdio>
 #include <cmath>
+
+#include <Eigen/Core>
+#include <Eigen/SVD>
+
+#include "kinematics.h"
+
+using namespace Eigen;
 
 /*
  * Given angle (in radians) of joint movement and link
@@ -33,13 +39,29 @@ void Kinematics::solveFK(Link link, float theta) {
 
 }
 
+
+// Compute pseudo inverse, logic from: http://eigen.tuxfamily.org/bz/show_bug.cgi?id=257
+template<typename _Matrix_Type_>
+bool pseudoInverse(const _Matrix_Type_ &a, _Matrix_Type_ &result, double epsilon = std::numeric_limits<double>::epsilon())
+{
+    if(a.rows() < a.cols())
+        return false;
+    Eigen::JacobiSVD< _Matrix_Type_ > svd = a.jacobiSvd(Eigen::ComputeThinU | Eigen::ComputeThinV);
+    double tolerance = epsilon * std::max(a.cols(), a.rows()) * svd.singularValues().array().abs().maxCoeff();
+    result = svd.matrixV() * _Matrix_Type_( (svd.singularValues().array().abs() > tolerance).select(svd.singularValues().array().inverse(), 0) ).asDiagonal() *
+        svd.matrixU().adjoint();
+}
+
 void Kinematics::solveIK(Link *link, Vector3f delta) {
     // Assert this is an end effector.
     assert(link->getOuterJoint()->getOuterLink().size() == 0);
 
     // Compute the jacobian on this link.
-    vector<Vector3f> jacobian = Kinematics::jacobian(link);
-
+    MatrixXf jacobian = Kinematics::jacobian(link);
+    MatrixXf pinv;
+    // TODO: handle false
+    pseudoInverse(jacobian, pinv);
+    
     // TODO: (hkothari) what else?
 }
 
@@ -51,7 +73,7 @@ float sumAngles(vector<float>* angles, unsigned int i, unsigned int j)
     return sum;
 }
 
-vector<Vector3f> Kinematics::jacobian(Link *link)
+MatrixXf Kinematics::jacobian(Link *link)
 {
     // Trace our way in, putting previous elements in the front.
     vector<Link*> path;
@@ -78,24 +100,21 @@ vector<Vector3f> Kinematics::jacobian(Link *link)
     // Now that we have all the lengths and thetas
     // Our matrix is of the form [dpn/dt1 dpn/dt2 ... dpn/dtn]
     // Logic replicated from http://njoubert.com/teaching/cs184_fa08/section/sec13inversekinematicsSOL.pdf (p.4)
-    vector<Vector3f> toReturn;
     unsigned int n = path.size();
+    MatrixXf toReturn(n, 3);
     for(unsigned int i = 0; i < n; i++)
     {
         // The ith column has n-i terms: 
-        Vector3f col;
         for(unsigned int j = i; j < n; j++)
         {
             //l1 cos(θ1) + l2 cos(θ1 + θ2)+ l3 cos(θ1 + θ2 + θ3) 
             float sumThetas = sumAngles(&thetas, 0, j+1);
-            col.x() += lengths[j] * cos(sumThetas);
-            col.y() -= lengths[j] * sin(sumThetas);
+            toReturn(i, 0) += lengths[j] * cos(sumThetas);
+            toReturn(i, 1) -= lengths[j] * sin(sumThetas);
         }
         // For now, the z coordinate is zero.
-        col.z() = 0;
-
-        // Since we're working our way from dt1 to dtn we push_back
-        toReturn.push_back(col);
+        toReturn(i, 2) = 0.0f;
     }
+
     return toReturn;
 }

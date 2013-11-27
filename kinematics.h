@@ -19,7 +19,7 @@ public:
 
     // It would make sense to use eigen matrix for this, unfortunately, we don't know how big our
     // matrix will be so instread we return a std::vector of Vector3fs.
-    static vector<Vector3f> jacobian(Link *link);
+    static MatrixXf jacobian(Link *link);
 };
 
 #endif
