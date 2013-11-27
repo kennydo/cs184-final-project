@@ -33,6 +33,7 @@ void Window::init(int w, int h, std::string t, int pos_x, int pos_y, Scene* s){
     glutDisplayFunc(Window::display);
     glutReshapeFunc(Window::reshape);
     glutKeyboardFunc(Window::keyboard);
+    glutSpecialFunc(Window::specialKeys);
     glutIdleFunc(Window::idle);
 }
 
@@ -66,16 +67,29 @@ void Window::idle(){
 void Window::keyboard(unsigned char key, int x, int y) {
     switch(key) {
         case '+':
-            printf("move joint clockwise\n");
-            scene->moveSkeleton(30);
+            printf("rotate joint clockwise\n");
+            scene->rotateSkeleton(30);
             break;
         case '-':
-            printf("move joint counterclockwise\n");
-            scene->moveSkeleton(-30);
+            printf("rotate joint counterclockwise\n");
+            scene->rotateSkeleton(-30);
             break;
         case ' ':
             printf("quitting\n");
             exit(0);
+            break;
+    }
+}
+
+void Window::specialKeys(int key, int x, int y) {
+    switch(key) {
+        case GLUT_KEY_UP:
+            printf("moving joint up");
+            scene->moveSkeleton(10);
+            break;
+        case GLUT_KEY_DOWN:
+            printf("moving joint down");
+            scene->moveSkeleton(-10);
             break;
     }
 }

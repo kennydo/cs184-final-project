@@ -22,6 +22,7 @@ class Window {
         static void idle();
         static void display();
         static void keyboard(unsigned char, int, int);
+        static void specialKeys(int, int, int);
 };
 
 #endif

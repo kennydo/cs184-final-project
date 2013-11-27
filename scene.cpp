@@ -88,9 +88,31 @@ void Scene::drawSkeleton() {
     
 }
 
-void Scene::moveSkeleton(float f) {
+void Scene::rotateSkeleton(float f) {
     theta += f*3.14159/180;
     
     vector<Link*> outerLinks = root->getOuterLink();
     Kinematics::solveFK(*(outerLinks.front()), theta);
+}
+
+// Moves the skeleton up and down, obviously this is poorly named..
+// we'll work on that.
+void Scene::moveSkeleton(float f) {
+    // IK can only solve for the end effector, so we want to find the last
+    // element and move it.
+    Vector3f delta;
+    delta.x() = 0.0f;
+    delta.y() = f;
+    delta.z() = 0.0f;
+
+    // TODO: We're just using the firstmost link for now this is obviously
+    // not a real solution.
+    Link *current = root->getOuterLink()[0];
+    Joint *j = current->getOuterJoint();
+    while(j != NULL && j->getOuterLink().size() == 0) {
+        current = j->getOuterLink()[0];
+        j = current->getOuterJoint();
+    }
+
+    Kinematics::solveIK(current, delta);
 }

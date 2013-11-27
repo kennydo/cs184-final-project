@@ -30,6 +30,8 @@ class Scene {
         void drawGrid(float, float, float, float, float);
         void drawLink(Link);
         void drawSkeleton();
+
+        void rotateSkeleton(float);
         void moveSkeleton(float);
 };
 

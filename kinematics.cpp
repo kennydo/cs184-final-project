@@ -1,4 +1,5 @@
 #include "kinematics.h"
+#include <cassert>
 #include <cstdio>
 #include <cmath>
 
@@ -30,6 +31,16 @@ void Kinematics::solveFK(Link link, float theta) {
         }
     }
 
+}
+
+void Kinematics::solveIK(Link *link, Vector3f delta) {
+    // Assert this is an end effector.
+    assert(link->getOuterJoint()->getOuterLink().size() == 0);
+
+    // Compute the jacobian on this link.
+    vector<Vector3f> jacobian = Kinematics::jacobian(link);
+
+    // TODO: (hkothari) what else?
 }
 
 // Helper for jacobian, sums angles of terms i to j
