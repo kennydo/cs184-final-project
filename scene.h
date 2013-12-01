@@ -17,7 +17,7 @@
 
 // picking tolerance in pixels
 #define PICK_TOLERANCE 10
-#define PICK_BUFFER_SIZE 128
+#define PICK_BUFFER_SIZE 256
 
 class Scene {
     private:
