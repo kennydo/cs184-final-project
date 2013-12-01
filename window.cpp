@@ -34,6 +34,7 @@ void Window::init(int w, int h, std::string t, int pos_x, int pos_y, Scene* s){
     glutReshapeFunc(Window::reshape);
     glutKeyboardFunc(Window::keyboard);
     glutSpecialFunc(Window::specialKeys);
+    glutMouseFunc(Window::mouse);
     glutIdleFunc(Window::idle);
 }
 
@@ -91,5 +92,14 @@ void Window::specialKeys(int key, int x, int y) {
             printf("moving joint down");
             scene->moveSkeleton(-10);
             break;
+    }
+}
+
+void Window::mouse(int button, int state, int x, int y) {
+    int window_height = glutGet(GLUT_WINDOW_HEIGHT);
+    if(button == GLUT_LEFT_BUTTON && state == GLUT_DOWN) {
+        // opengl expects y=0 to be the bottom of the screen,
+        // but glut has y=- be the top of the screen, so we do math
+        scene->getNumClickHits(x, window_height - y);
     }
 }

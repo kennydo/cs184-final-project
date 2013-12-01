@@ -4,6 +4,8 @@
 Scene::Scene(){
     // initialize variables
     theta = 0;
+    glSelectBuffer(PICK_BUFFER_SIZE, pickBuffer);
+    renderMode = GL_RENDER;
 }
 
 void Scene::addRootJoint(Joint *j) {
@@ -32,6 +34,10 @@ void Scene::refreshCamera(){
 }
 
 void Scene::draw(){
+    if(renderMode == GL_SELECT){
+        glInitNames();
+    }
+    glLoadName(99); // a distinct-looking name for debugging purposes
     drawSkeleton();
 }
 
@@ -115,4 +121,27 @@ void Scene::moveSkeleton(float f) {
     }
 
     Kinematics::solveIK(current, delta);
+}
+
+int Scene::getNumClickHits(int x, int y) {
+    /*
+     * the x and y are where the click happened, where
+     * x=0 is left side of the screen and
+     * y=0 is the bottom of the screen
+     */
+    int numHits;
+
+    printf("Scene:getNumClickHits called with x=%d, y=%d\n", x, y);
+    renderMode = GL_SELECT;
+    glRenderMode(renderMode);
+    draw();
+
+    renderMode = GL_RENDER;
+    numHits = glRenderMode(GL_RENDER);
+    printf("Scene got %d hits\n", numHits);
+    if (numHits == 0){
+        return numHits;
+   }
+
+    return 0;
 }

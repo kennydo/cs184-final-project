@@ -15,9 +15,15 @@
 #include "joint.h"
 #include "kinematics.h"
 
+// picking tolerance in pixels
+#define PICK_TOLERANCE 10
+#define PICK_BUFFER_SIZE 128
+
 class Scene {
     private:
         float theta; //testing FK
+        unsigned int pickBuffer[PICK_BUFFER_SIZE];
+        int renderMode; // either GL_RENDER or GL_SELECT
         Joint *root;
     public:
         Scene();
@@ -33,6 +39,8 @@ class Scene {
 
         void rotateSkeleton(float);
         void moveSkeleton(float);
+
+        int getNumClickHits(int, int);
 };
 
 #endif
