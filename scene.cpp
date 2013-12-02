@@ -4,7 +4,6 @@
 Scene::Scene(){
     // initialize variables
     theta = 0;
-    glSelectBuffer(PICK_BUFFER_SIZE, pickBuffer);
     renderMode = GL_RENDER;
 }
 
@@ -143,6 +142,7 @@ int Scene::getNumClickHits(int x, int y) {
      */
     GLint numHits;
 
+    glSelectBuffer(PICK_BUFFER_SIZE, pickBuffer);
     renderMode = GL_SELECT;
     glRenderMode(renderMode);
     refreshCamera(x, y);
