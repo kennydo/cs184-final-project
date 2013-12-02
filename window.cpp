@@ -114,5 +114,5 @@ void Window::mouse(int button, int state, int x, int y) {
 void Window::motion(int x, int y) {
     int windowHeight = glutGet(GLUT_WINDOW_HEIGHT);
 
-    scene->onMouseMotion(x, y);
+    scene->onMouseMotion(x, windowHeight - y);
 }
