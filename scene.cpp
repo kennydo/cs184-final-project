@@ -4,13 +4,19 @@
 Scene::Scene(){
     // initialize variables
     theta = 0;
+    renderMode = GL_RENDER;
 }
 
 void Scene::addRootJoint(Joint *j) {
     root = j;
 }
 
-void Scene::refreshCamera(){
+void Scene::refreshCamera(int x, int y){
+    // the x and y are where the click happened.
+    // when the renderMode isn't GL_SELECT, those values aren't used for anything
+    // so just pass in dummy 0,0
+    int viewport[4];
+
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
     GLfloat light_pos[4] = {0.0, 0.0, -1.0, 0.0};
@@ -24,6 +30,13 @@ void Scene::refreshCamera(){
 
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
+    if(renderMode == GL_SELECT){
+        glGetIntegerv(GL_VIEWPORT, viewport);
+        gluPickMatrix((double) x, (double) y,
+                      PICK_TOLERANCE, PICK_TOLERANCE,
+                      viewport);
+    }
+
     // we'll probably want to not be using ortho projection
     glOrtho(-0.6, 0.6,
             -0.6, 0.6,
@@ -32,7 +45,11 @@ void Scene::refreshCamera(){
 }
 
 void Scene::draw(){
+    glInitNames();
+    glPushName(0);
+    glLoadName(67); // a distinct-looking name for debugging purposes
     drawSkeleton();
+
 }
 
 void Scene::drawGrid(float xMin, float xMax, float zMin, float zMax, float step){
@@ -115,4 +132,45 @@ void Scene::moveSkeleton(float f) {
     }
 
     Kinematics::solveIK(current, delta);
+}
+
+int Scene::getNumClickHits(int x, int y) {
+    /*
+     * the x and y are where the click happened, where
+     * x=0 is left side of the screen and
+     * y=0 is the bottom of the screen
+     */
+    GLint numHits;
+
+    glSelectBuffer(PICK_BUFFER_SIZE, pickBuffer);
+    renderMode = GL_SELECT;
+    glRenderMode(renderMode);
+    refreshCamera(x, y);
+    draw();
+
+    renderMode = GL_RENDER;
+    numHits = glRenderMode(renderMode);
+    // if numHits == -1, there was a overflow in the selection buffer
+    if (numHits == 0){
+        return numHits;
+    }
+
+    printf("Scene:getNumClickHits called with x=%d, y=%d\n", x, y);
+    printf("Scene got %d hits\n", numHits);
+    // we successfully hit a named object!
+    GLuint numItems, item;
+    float zMin, zMax;
+    // we only care about the first hit for now
+    numItems = pickBuffer[0];
+    zMin = pickBuffer[1] / (pow(2, 32) - 1.0);
+    zMax = pickBuffer[2] / (pow(2, 32) - 1.0);
+    printf("numItems: %d\nzMin: %f\nzMax: %f\n",
+           numItems, zMin, zMax);
+    for(unsigned int j=0; j<numItems; j++){
+        item = pickBuffer[3 + j];
+        printf("item: %d\n", item);
+    }
+    printf("\n");
+
+    return numHits;
 }

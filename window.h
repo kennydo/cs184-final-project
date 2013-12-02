@@ -23,6 +23,7 @@ class Window {
         static void display();
         static void keyboard(unsigned char, int, int);
         static void specialKeys(int, int, int);
+        static void mouse(int, int, int, int);
 };
 
 #endif
