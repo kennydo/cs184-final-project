@@ -45,7 +45,7 @@ void Window::display(){
     // this is where the magic happens
     // it's time to draw polygons and stuff!
 
-    Window::scene->refreshCamera();
+    Window::scene->refreshCamera(0, 0);
     Window::scene->draw();
 
     glFlush();

@@ -17,20 +17,20 @@
 
 // picking tolerance in pixels
 #define PICK_TOLERANCE 10
-#define PICK_BUFFER_SIZE 256
+#define PICK_BUFFER_SIZE 512
 
 class Scene {
     private:
         float theta; //testing FK
-        unsigned int pickBuffer[PICK_BUFFER_SIZE];
-        int renderMode; // either GL_RENDER or GL_SELECT
+        GLuint pickBuffer[PICK_BUFFER_SIZE];
+        GLenum renderMode; // either GL_RENDER or GL_SELECT
         Joint *root;
     public:
         Scene();
         
         void addRootJoint(Joint*);
 
-        void refreshCamera();
+        void refreshCamera(int, int);
         void draw();
 
         void drawGrid(float, float, float, float, float);
