@@ -96,10 +96,16 @@ void Window::specialKeys(int key, int x, int y) {
 }
 
 void Window::mouse(int button, int state, int x, int y) {
-    int window_height = glutGet(GLUT_WINDOW_HEIGHT);
-    if(button == GLUT_LEFT_BUTTON && state == GLUT_DOWN) {
-        // opengl expects y=0 to be the bottom of the screen,
-        // but glut has y=- be the top of the screen, so we do math
-        scene->onLeftClick(x, window_height - y);
+    int windowHeight = glutGet(GLUT_WINDOW_HEIGHT);
+
+    // opengl expects y=0 to be the bottom of the screen,
+    // but glut has y=- be the top of the screen, so be sure to do
+    // math. Pass in (x, windowHeight - y)
+    if(button == GLUT_LEFT_BUTTON) {
+        if(state == GLUT_DOWN){
+            scene->onLeftClick(x, windowHeight - y);
+        } else if(state == GLUT_UP){
+            scene->onLeftRelease(x, windowHeight - y);
+        }
     }
 }

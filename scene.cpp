@@ -172,3 +172,7 @@ void Scene::onLeftClick(int x, int y) {
     }
     printf("\n");
 }
+
+void Scene::onLeftRelease(int x, int y) {
+    printf("Scene::onLeftRelease called with x=%d, y=%d\n", x, y);
+}

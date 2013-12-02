@@ -41,6 +41,7 @@ class Scene {
         void moveSkeleton(float);
 
         void onLeftClick(int, int);
+        void onLeftRelease(int, int);
 };
 
 #endif
