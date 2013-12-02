@@ -27,8 +27,6 @@ void Kinematics::solveFK(Link link, float theta) {
     
     outer->moveJoint(v);
     
-    printf("new joint position x: %f y: %f z: %f\n", v.x(), v.y(), v.z());
-    
     vector<Link*> outerLinks = outer->getOuterLink();
     
     if ( outerLinks.size() > 0 ) {
@@ -49,59 +47,98 @@ bool pseudoInverse(const _Matrix_Type_ &a, _Matrix_Type_ &result, double epsilon
     Eigen::JacobiSVD< _Matrix_Type_ > svd = a.jacobiSvd(Eigen::ComputeThinU | Eigen::ComputeThinV);
     double tolerance = epsilon * std::max(a.cols(), a.rows()) * svd.singularValues().array().abs().maxCoeff();
     result = svd.matrixV() * _Matrix_Type_( (svd.singularValues().array().abs() > tolerance).select(svd.singularValues().array().inverse(), 0) ).asDiagonal() *
-        svd.matrixU().adjoint();
+    svd.matrixU().adjoint();
+    return true;
 }
 
-void Kinematics::solveIK(Link *link, Vector3f delta) {
-    // Assert this is an end effector.
-    assert(link->getOuterJoint()->getOuterLink().size() == 0);
-
+void evaluateSteps(float step, Vector3f goalPosition, float currentDistance, vector<Link*> &path, vector<float> &thetas, vector<float> &lengths) {
+    
     // Compute the jacobian on this link.
-    MatrixXf jacobian = Kinematics::jacobian(link);
+    MatrixXf jacobian = Kinematics::jacobian(path, thetas, lengths);
     MatrixXf pinv;
     // TODO: handle false ie. the case where links <= 2
     pseudoInverse(jacobian, pinv);
     
-    // TODO: (hkothari) newtons method as follows:
     // d0 = pseudoInverse * delta
-    // calculate new point caused by d0
-    // calculate distance from goal of new point
-    //if distance descreased, take that step.
-    // otherwise halve theta.
+    VectorXf d0 = pinv*currentDistance;
+    
+    // calcuate new point caused by d0
+    Vector3f newPosition(0, 0, 0);
+    float total_theta = 0;
+    
+    for (unsigned int i = 0; i < d0.size(); i++) {
+        Joint *inner = (path[i])->getInnerJoint();
+        
+        total_theta = total_theta + d0[i] + thetas[i];
+        
+        newPosition.x() += (inner->pos()).x() + lengths[i]*sin(total_theta);
+        newPosition.y() += (inner->pos()).y() + lengths[i]*cos(total_theta);
+    }
+    
+    //calculate distance from goal of new point
+    Vector3f vnewDistance = goalPosition - newPosition;
+    float newDistance = sqrt(vnewDistance.dot(vnewDistance));
+    
+    //if distance decreased, take step
+    // if distance did not decrease, half the step and try again
+    if (newDistance < currentDistance) {
+        for (unsigned int i = 0; i < d0.size(); i++) {
+            Kinematics::solveFK(*(path[i]), thetas[i] + d0[i]);
+        }
+    } else {
+        evaluateSteps(step/2, goalPosition, currentDistance, path, thetas, lengths);
+    }
+    
+}
+
+void Kinematics::solveIK(Link *link, Vector3f goalPosition) {
+    // Assert this is an end effector.
+    assert(link->getOuterJoint()->getOuterLink().size() == 0);
+    Vector3f vCurrentDistance = goalPosition - link->getOuterJoint()->pos();
+    float currentDistance = sqrt(vCurrentDistance.dot(vCurrentDistance));
+    
+    while (currentDistance > 0.001) {
+    
+        // Trace our way in, putting previous elements in the front.
+        vector<Link*> path;
+        vector<float> thetas;
+        vector<float> lengths;
+
+        path.insert(path.begin(), link);
+        thetas.insert(thetas.begin(), link->getAngle());
+        lengths.insert(lengths.begin(), link->getLength());
+
+        Joint* innerJoint = link->getInnerJoint();
+        Link* innerLink = innerJoint->getInnerLink();
+
+        while(innerLink != NULL)
+        {
+            path.insert(path.begin(), innerLink);
+            thetas.insert(thetas.begin(), innerLink->getAngle());
+            lengths.insert(lengths.begin(), innerLink->getLength());
+
+            innerJoint = innerLink->getInnerJoint();
+            innerLink = innerJoint->getInnerLink();
+        }
+        
+        float step = 5*3.14159/180;
+        evaluateSteps(step, goalPosition, currentDistance, path, thetas, lengths);
+    
+    }
+    
+    
 }
 
 // Helper for jacobian, sums angles of terms i to j
 float sumAngles(vector<float>* angles, unsigned int i, unsigned int j)
 {
     float sum = 0.0f;
-    for(int u = i; u < j; u++) sum += (*angles)[u];
+    for(unsigned int u = i; u < j; u++) sum += (*angles)[u];
     return sum;
 }
 
-MatrixXf Kinematics::jacobian(Link *link)
+MatrixXf Kinematics::jacobian(vector<Link*> &path, vector<float> &thetas, vector<float> &lengths)
 {
-    // Trace our way in, putting previous elements in the front.
-    vector<Link*> path;
-    vector<float> thetas;
-    vector<float> lengths;
-
-    path.insert(path.begin(), link);
-    thetas.insert(thetas.begin(), link->getAngle());
-    lengths.insert(lengths.begin(), link->getLength());
-
-    Joint* innerJoint = link->getInnerJoint();
-    Link* innerLink = innerJoint->getInnerLink();
-
-    while(innerLink != NULL)
-    {
-        path.insert(path.begin(), innerLink);
-        thetas.insert(thetas.begin(), innerLink->getAngle());
-        lengths.insert(lengths.begin(), innerLink->getLength());
-
-        innerJoint = innerLink->getInnerJoint();
-        innerLink = innerJoint->getInnerLink();
-    }
-
     // Now that we have all the lengths and thetas
     // Our matrix is of the form [dpn/dt1 dpn/dt2 ... dpn/dtn]
     // Logic replicated from http://njoubert.com/teaching/cs184_fa08/section/sec13inversekinematicsSOL.pdf (p.4)
