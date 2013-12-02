@@ -143,7 +143,6 @@ int Scene::getNumClickHits(int x, int y) {
      */
     GLint numHits;
 
-    printf("Scene:getNumClickHits called with x=%d, y=%d\n", x, y);
     renderMode = GL_SELECT;
     glRenderMode(renderMode);
     refreshCamera(x, y);
@@ -156,6 +155,7 @@ int Scene::getNumClickHits(int x, int y) {
         return numHits;
     }
 
+    printf("Scene:getNumClickHits called with x=%d, y=%d\n", x, y);
     printf("Scene got %d hits\n", numHits);
     // we successfully hit a named object!
     GLuint numItems, item;
