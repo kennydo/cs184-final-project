@@ -5,6 +5,7 @@ Scene::Scene(){
     // initialize variables
     theta = 0;
     renderMode = GL_RENDER;
+    mouseButtonPressed = 0;
 }
 
 void Scene::addRootJoint(Joint *j) {
@@ -141,6 +142,9 @@ void Scene::onLeftClick(int x, int y) {
      * y=0 is the bottom of the screen
      */
     printf("Scene::onLeftClick called with x=%d, y=%d\n", x, y);
+    mouseButtonPressed = GLUT_LEFT_BUTTON;
+    mouseClickStartX = x;
+    mouseClickStartY = y;
     GLint numHits;
 
     glSelectBuffer(PICK_BUFFER_SIZE, pickBuffer);
@@ -175,9 +179,18 @@ void Scene::onLeftClick(int x, int y) {
 
 void Scene::onLeftRelease(int x, int y) {
     printf("Scene::onLeftRelease called with x=%d, y=%d\n", x, y);
+    mouseButtonPressed = 0;
 }
 
 void Scene::onMouseMotion(int x, int y) {
     // this function is called every time the mouse moves while a button is pressed
-    printf("Scene::onMouseMotion called with x=%d, y=%d\n", x, y);
+    int dX = x - mouseClickStartX;
+    int dY = y - mouseClickStartY;
+
+    printf("Scene::onMouseMotion called with x=%d, y=%d    dX=%d, dY=%d\n", x, y, dX, dY);
+    if(mouseButtonPressed == GLUT_LEFT_BUTTON){
+
+    } else if (mouseButtonPressed == GLUT_RIGHT_BUTTON) {
+
+    }
 }

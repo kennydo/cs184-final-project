@@ -25,6 +25,8 @@ class Scene {
         GLuint pickBuffer[PICK_BUFFER_SIZE];
         GLenum renderMode; // either GL_RENDER or GL_SELECT
         Joint *root;
+        GLenum mouseButtonPressed;
+        int mouseClickStartX, mouseClickStartY;
     public:
         Scene();
         
