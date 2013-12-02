@@ -100,6 +100,6 @@ void Window::mouse(int button, int state, int x, int y) {
     if(button == GLUT_LEFT_BUTTON && state == GLUT_DOWN) {
         // opengl expects y=0 to be the bottom of the screen,
         // but glut has y=- be the top of the screen, so we do math
-        scene->getNumClickHits(x, window_height - y);
+        scene->onLeftClick(x, window_height - y);
     }
 }

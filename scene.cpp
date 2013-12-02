@@ -134,12 +134,13 @@ void Scene::moveSkeleton(float f) {
     Kinematics::solveIK(current, delta);
 }
 
-int Scene::getNumClickHits(int x, int y) {
+void Scene::onLeftClick(int x, int y) {
     /*
      * the x and y are where the click happened, where
      * x=0 is left side of the screen and
      * y=0 is the bottom of the screen
      */
+    printf("Scene::onLeftClick called with x=%d, y=%d\n", x, y);
     GLint numHits;
 
     glSelectBuffer(PICK_BUFFER_SIZE, pickBuffer);
@@ -152,10 +153,9 @@ int Scene::getNumClickHits(int x, int y) {
     numHits = glRenderMode(renderMode);
     // if numHits == -1, there was a overflow in the selection buffer
     if (numHits == 0){
-        return numHits;
+        return;
     }
 
-    printf("Scene:getNumClickHits called with x=%d, y=%d\n", x, y);
     printf("Scene got %d hits\n", numHits);
     // we successfully hit a named object!
     GLuint numItems, item;
@@ -171,6 +171,4 @@ int Scene::getNumClickHits(int x, int y) {
         printf("item: %d\n", item);
     }
     printf("\n");
-
-    return numHits;
 }

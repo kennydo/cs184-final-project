@@ -40,7 +40,7 @@ class Scene {
         void rotateSkeleton(float);
         void moveSkeleton(float);
 
-        int getNumClickHits(int, int);
+        void onLeftClick(int, int);
 };
 
 #endif
