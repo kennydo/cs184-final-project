@@ -40,6 +40,7 @@ class Scene {
         void rotateSkeleton(float);
         void moveSkeleton(float);
 
+        void onMouseMotion(int, int);
         void onLeftClick(int, int);
         void onLeftRelease(int, int);
 };

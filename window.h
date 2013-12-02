@@ -24,6 +24,7 @@ class Window {
         static void keyboard(unsigned char, int, int);
         static void specialKeys(int, int, int);
         static void mouse(int, int, int, int);
+        static void motion(int, int);
 };
 
 #endif

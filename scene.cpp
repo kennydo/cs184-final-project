@@ -176,3 +176,8 @@ void Scene::onLeftClick(int x, int y) {
 void Scene::onLeftRelease(int x, int y) {
     printf("Scene::onLeftRelease called with x=%d, y=%d\n", x, y);
 }
+
+void Scene::onMouseMotion(int x, int y) {
+    // this function is called every time the mouse moves while a button is pressed
+    printf("Scene::onMouseMotion called with x=%d, y=%d\n", x, y);
+}

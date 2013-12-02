@@ -35,6 +35,7 @@ void Window::init(int w, int h, std::string t, int pos_x, int pos_y, Scene* s){
     glutKeyboardFunc(Window::keyboard);
     glutSpecialFunc(Window::specialKeys);
     glutMouseFunc(Window::mouse);
+    glutMotionFunc(Window::motion);
     glutIdleFunc(Window::idle);
 }
 
@@ -108,4 +109,10 @@ void Window::mouse(int button, int state, int x, int y) {
             scene->onLeftRelease(x, windowHeight - y);
         }
     }
+}
+
+void Window::motion(int x, int y) {
+    int windowHeight = glutGet(GLUT_WINDOW_HEIGHT);
+
+    scene->onMouseMotion(x, y);
 }
