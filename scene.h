@@ -19,6 +19,16 @@
 #define PICK_TOLERANCE 10
 #define PICK_BUFFER_SIZE 512
 
+class MouseToWorldConverter {
+    private:
+        GLdouble modelViewMatrix[16];
+        GLdouble projectionMatrix[16];
+        GLint viewport[16];
+    public:
+        MouseToWorldConverter();
+        void convert(int, int, double&, double&, double&);
+};
+
 class Scene {
     private:
         float theta; //testing FK
@@ -26,7 +36,13 @@ class Scene {
         GLenum renderMode; // either GL_RENDER or GL_SELECT
         Joint *root;
         GLenum mouseButtonPressed;
-        int mouseClickStartX, mouseClickStartY;
+        double mouseClickStartX, mouseClickStartY; // in world coordinates
+        double mousePreviousX, mousePreviousY; // in world coordiantes
+
+        double translateX, translateY; // in world coordinates
+
+        void mouseToWorldCoordinates(int, int, double&, double&, double&);
+        MouseToWorldConverter converter;
     public:
         Scene();
         
@@ -46,5 +62,6 @@ class Scene {
         void onLeftClick(int, int);
         void onLeftRelease(int, int);
 };
+
 
 #endif
