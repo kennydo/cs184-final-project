@@ -12,10 +12,14 @@ else
 endif
 	
 RM = /bin/rm -f 
-CPP_FILES = main.cpp joint.cpp window.cpp scene.cpp kinematics.cpp
+CPP_FILES = $(wildcard *.cpp)
+OBJ_FILES = $(notdir $(CPP_FILES:.cpp=.o))
 
-all:
-	$(CC) $(CFLAGS) -o kinematics $(CPP_FILES) $(LDFLAGS) $(EIGEN_INCLUDE)
+all: $(OBJ_FILES)
+	$(CC) $(CFLAGS) -o kinematics $^ $(LDFLAGS) $(EIGEN_INCLUDE)
+
+%.o: %.cpp
+	$(CC) $(CFLAGS) -c -o $@ $< $(LDFLAGS) $(EIGEN_INCLUDE)
 
 clean: 
 	$(RM) *.o kinematics
