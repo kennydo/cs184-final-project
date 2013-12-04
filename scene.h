@@ -24,11 +24,12 @@ class Scene {
         float theta; //testing FK
         GLuint pickBuffer[PICK_BUFFER_SIZE];
         GLenum renderMode; // either GL_RENDER or GL_SELECT
-        Joint *root;
+        Joint *root, *endEffector;
     public:
         Scene();
         
         void addRootJoint(Joint*);
+        void addEndEffector(Joint*);
 
         void refreshCamera(int, int);
         void draw();

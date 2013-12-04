@@ -40,6 +40,7 @@ int main(int argc, char* argv[])
     L23.addOuterJoint(&j3);
 
     scene->addRootJoint(&j1);
+    scene->addEndEffector(&j3);
 
     glutInit(&argc, argv);
 

@@ -1,5 +1,6 @@
 #include "scene.h"
 #include <cstdio>
+#include <iostream>
 
 Scene::Scene(){
     // initialize variables
@@ -9,6 +10,10 @@ Scene::Scene(){
 
 void Scene::addRootJoint(Joint *j) {
     root = j;
+}
+
+void Scene::addEndEffector(Joint *j) {
+    endEffector = j;
 }
 
 void Scene::refreshCamera(int x, int y){
@@ -112,6 +117,7 @@ void Scene::rotateSkeleton(float f) {
     Kinematics::solveFK(*(outerLinks.front()), theta);
 }
 
+
 // Moves the skeleton up and down, obviously this is poorly named..
 // we'll work on that.
 void Scene::moveSkeleton(float f) {
@@ -121,17 +127,22 @@ void Scene::moveSkeleton(float f) {
     delta.x() = 0.0f;
     delta.y() = f;
     delta.z() = 0.0f;
-
+    
     // TODO: We're just using the firstmost link for now this is obviously
     // not a real solution.
-    Link *current = root->getOuterLink()[0];
+    /*Link *current = root->getOuterLink()[0];
     Joint *j = current->getOuterJoint();
-    while(j != NULL && j->getOuterLink().size() == 0) {
+    while(j->getOuterLink().size() == 0) {
         current = j->getOuterLink()[0];
         j = current->getOuterJoint();
-    }
-
-    Kinematics::solveIK(current, delta);
+    }*/
+    
+    cout << "before IK\n" << endEffector->pos() <<endl;
+    
+    Vector3f goalPosition = endEffector->pos() + delta;
+    Kinematics::solveIK(endEffector->getInnerLink(), goalPosition);
+    
+    cout << "final position\n" << endEffector->pos() << endl;
 }
 
 int Scene::getNumClickHits(int x, int y) {

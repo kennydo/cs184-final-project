@@ -18,7 +18,7 @@ private:
     vector<Link*> l1_; //outer link(s)
     
 public:
-    Joint(Vector3f position) : pos_(position) {}
+    Joint(Vector3f position) : pos_(position), l0_(NULL) {}
 
     void addInnerLink(Link *inner) { l0_ = inner; }
     void addOuterLink(Link *outer) { l1_.push_back(outer); }
@@ -36,7 +36,7 @@ private:
     Joint *j0_; //inner joint
     Joint *j1_; //outer joint
 public:
-    Link(float length, float theta) : length_(length), theta_(theta) {}
+    Link(float length, float theta) : length_(length), theta_(theta), j0_(NULL), j1_(NULL) {}
     
     void addInnerJoint(Joint *inner) { j0_ = inner; }
     void addOuterJoint(Joint *outer) { j1_ = outer; }
