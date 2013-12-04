@@ -125,7 +125,9 @@ void Scene::rotateSkeleton(float f) {
     vector<Link*> outerLinks = root->getOuterLink();
     Kinematics::solveFK(outerLinks.front(), theta);
     
-    
+    //cout << "joint1 position \n" << root->pos() <<endl;
+    //cout << "joint2 position: \n" << outerLinks.front()->getOuterJoint()->pos() << endl;
+    //cout << "joint3 position: \n" << endEffector->pos() << endl;
 }
 
 
