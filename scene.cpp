@@ -4,7 +4,7 @@
 
 Scene::Scene(){
     // initialize variables
-    theta = 0;
+    delta = Vector3f(0, 0, 0);
     renderMode = GL_RENDER;
     mouseButtonPressed = 0;
     translateX = 0;
@@ -120,10 +120,12 @@ void Scene::drawSkeleton() {
 }
 
 void Scene::rotateSkeleton(float f) {
-    theta += f*3.14159/180;
+    float theta = f*3.14159/180;
     
     vector<Link*> outerLinks = root->getOuterLink();
-    Kinematics::solveFK(*(outerLinks.front()), theta);
+    Kinematics::solveFK(outerLinks.front(), theta);
+    
+    
 }
 
 
@@ -132,10 +134,7 @@ void Scene::rotateSkeleton(float f) {
 void Scene::moveSkeleton(float f) {
     // IK can only solve for the end effector, so we want to find the last
     // element and move it.
-    Vector3f delta;
-    delta.x() = 0.0f;
-    delta.y() = f;
-    delta.z() = 0.0f;
+    delta.y() += f;
     
     // TODO: We're just using the firstmost link for now this is obviously
     // not a real solution.

@@ -40,6 +40,7 @@ public:
     
     void addInnerJoint(Joint *inner) { j0_ = inner; }
     void addOuterJoint(Joint *outer) { j1_ = outer; }
+    void updateAngle(float theta) { theta_ = theta; }
     
     Joint* getInnerJoint() { return j0_; }
     Joint* getOuterJoint() { return j1_; }

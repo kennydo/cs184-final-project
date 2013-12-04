@@ -11,7 +11,7 @@ using namespace Eigen;
 
 class Kinematics {
 public:
-    static void solveFK(Link link, float theta);
+    static void solveFK(Link *link, float theta);
     
     //void evaluateSteps(float step, Vector3f goalPosition, float currentDistance, vector<Link*> &path, vector<float> &thetas, vector<float> &lengths);
 

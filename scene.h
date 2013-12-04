@@ -31,7 +31,7 @@ class MouseToWorldConverter {
 
 class Scene {
     private:
-        float theta; //testing FK
+        Vector3f delta; //testing IK
         GLuint pickBuffer[PICK_BUFFER_SIZE];
         GLenum renderMode; // either GL_RENDER or GL_SELECT
         Joint *root, *endEffector;
