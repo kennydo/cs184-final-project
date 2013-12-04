@@ -87,11 +87,11 @@ void Window::specialKeys(int key, int x, int y) {
     switch(key) {
         case GLUT_KEY_UP:
             printf("moving joint up\n");
-            scene->moveSkeleton(10);
+            scene->moveSkeleton(1);
             break;
         case GLUT_KEY_DOWN:
             printf("moving joint down\n");
-            scene->moveSkeleton(-10);
+            scene->moveSkeleton(-1);
             break;
     }
 }

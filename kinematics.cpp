@@ -103,6 +103,9 @@ bool reachedGoal(Vector3f goalPosition, Link * link, float &distance) {
 
     if (fabs(distance) < EPSILON) {
         printf("GOAL REACHED\n");
+        /*cout << "goal position\n" << goalPosition << endl;
+        cout << "outer joint pos\n" << link->getOuterJoint()->pos() << endl;
+        printf("distance: %f\n", distance);*/
         return true;
     }
     return false;
@@ -138,7 +141,7 @@ void Kinematics::solveIK(Link *link, Vector3f goalPosition) {
     }
     
     float currentDistance;
-    float step = 0.1;
+    float step = 0.05;
     while (!reachedGoal(goalPosition, link, currentDistance)) {
         // Compute the jacobian on this link.
         MatrixXf jacobian = Kinematics::jacobian(path, thetas, lengths);
@@ -154,9 +157,6 @@ void Kinematics::solveIK(Link *link, Vector3f goalPosition) {
         VectorXf d0_step = d0*step;
         Vector3f newPosition = getNewPosition(d0_step, path, thetas, lengths);
         
-        //cout << "d0 \n" << d0 << endl;
-        //cout << "d0_step\n" << d0_step << endl;
-        
         //calculate distance from goal of new point
         Vector3f vnewDistance = goalPosition - newPosition;
         float newDistance = sqrt(vnewDistance.dot(vnewDistance));
@@ -164,19 +164,16 @@ void Kinematics::solveIK(Link *link, Vector3f goalPosition) {
         //if distance decreased, take step
         // if distance did not decrease, half the step and try again
         if (newDistance < currentDistance) {
-            //printf("taking step\n");
             for (unsigned int i = 0; i < d0.size(); i++) {
                 Kinematics::solveFK(path[i], d0_step[i]);
             }
-            cout << "------------------------------\n" << endl;
+            /*cout << "------------------------------\n" << endl;
             cout<< "new position\n" << newPosition <<endl;
-            cout<< "FK new position\n" << link->getOuterJoint()->pos() << endl;
+            cout<< "FK new position\n" << link->getOuterJoint()->pos() << endl;*/
             Kinematics::solveIK(path.back(), goalPosition);
         } else if (isgreater(step/2, 0.0f)) {
-            //printf("halving step\n");
             step = step/2;
         } else {
-            cout << "goal impossible to reach" << endl;
             return;
         }
     }

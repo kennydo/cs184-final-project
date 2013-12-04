@@ -136,7 +136,7 @@ void Scene::rotateSkeleton(float f) {
 void Scene::moveSkeleton(float f) {
     // IK can only solve for the end effector, so we want to find the last
     // element and move it.
-    delta.y() += f;
+    delta.y() = f;
     
     // TODO: We're just using the firstmost link for now this is obviously
     // not a real solution.
@@ -147,11 +147,12 @@ void Scene::moveSkeleton(float f) {
         j = current->getOuterJoint();
     }*/
     
+    cout << "-------------------------------\n delta\n" << delta << endl;
+    
     cout << "before IK\n" << endEffector->pos() <<endl;
-    
     Vector3f goalPosition = endEffector->pos() + delta;
+    cout << "goalPosition\n" << goalPosition << endl;
     Kinematics::solveIK(endEffector->getInnerLink(), goalPosition);
-    
     cout << "final position\n" << endEffector->pos() << endl;
 }
 
