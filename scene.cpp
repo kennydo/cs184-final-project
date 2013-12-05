@@ -190,8 +190,8 @@ void Scene::onLeftClick(int mouseX, int mouseY) {
     float zMin, zMax;
     // we only care about the first hit for now
     numItems = pickBuffer[0];
-    zMin = pickBuffer[1] / (pow(2, 32) - 1.0);
-    zMax = pickBuffer[2] / (pow(2, 32) - 1.0);
+    zMin = pickBuffer[1] / (pow(2.0, 32.0) - 1.0);
+    zMax = pickBuffer[2] / (pow(2.0, 32.0) - 1.0);
     printf("numItems: %d\nzMin: %f\nzMax: %f\n",
            numItems, zMin, zMax);
     for(unsigned int j=0; j<numItems; j++){
