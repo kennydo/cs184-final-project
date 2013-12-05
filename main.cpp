@@ -18,9 +18,9 @@ int main(int argc, char* argv[])
 {
     Scene* scene = new Scene();
     
-    Vector3f p1 ( 0.0, 0.0, 0.0 );
-    Vector3f p2 ( 0.0, 4.0, 0.0 );
-    Vector3f p3 ( 4.0, 4.0, 0.0 );
+    Vector3d p1 ( 0.0, 0.0, 0.0 );
+    Vector3d p2 ( 0.0, 4.0, 0.0 );
+    Vector3d p3 ( 4.0, 4.0, 0.0 );
     
     Joint j1 = Joint(p1);
     Joint j2 = Joint(p2);

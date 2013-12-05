@@ -70,11 +70,11 @@ void Window::keyboard(unsigned char key, int x, int y) {
     switch(key) {
         case '+':
             printf("rotate joint clockwise\n");
-            scene->rotateSkeleton(90);
+            scene->rotateSkeleton((double) 90);
             break;
         case '-':
             printf("rotate joint counterclockwise\n");
-            scene->rotateSkeleton(-90);
+            scene->rotateSkeleton((double) -90);
             break;
         case ' ':
             printf("quitting\n");
@@ -87,11 +87,11 @@ void Window::specialKeys(int key, int x, int y) {
     switch(key) {
         case GLUT_KEY_UP:
             printf("moving joint up\n");
-            scene->moveSkeleton(1);
+            scene->moveSkeleton((double) 1);
             break;
         case GLUT_KEY_DOWN:
             printf("moving joint down\n");
-            scene->moveSkeleton(-1);
+            scene->moveSkeleton((double) -1);
             break;
     }
 }

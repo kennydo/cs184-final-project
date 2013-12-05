@@ -4,7 +4,7 @@
 
 Scene::Scene(){
     // initialize variables
-    delta = Vector3f(0, 0, 0);
+    delta = Vector3d(0, 0, 0);
     renderMode = GL_RENDER;
     mouseButtonPressed = 0;
     translateX = 0;
@@ -88,8 +88,8 @@ void Scene::drawLink(Link link) {
     Joint *j1 = link.getInnerJoint();
     Joint *j2 = link.getOuterJoint();
     
-    Vector3f p1 = j1->pos();
-    Vector3f p2 = j2->pos();
+    Vector3d p1 = j1->pos();
+    Vector3d p2 = j2->pos();
     
     //printf("vector 1 x: %f y: %f z: %f\n", p1.x(), p1.y(), p1.z());
     //printf("vector 2 x: %f y: %f z: %f\n", p2.x(), p2.y(), p2.z());
@@ -119,24 +119,21 @@ void Scene::drawSkeleton() {
     
 }
 
-void Scene::rotateSkeleton(float f) {
-    float theta = f*3.14159/180;
+void Scene::rotateSkeleton(double f) {
+    double theta = f*3.14159/180;
     
     vector<Link*> outerLinks = root->getOuterLink();
     Kinematics::solveFK(outerLinks.front(), theta);
-    
-    //cout << "joint1 position \n" << root->pos() <<endl;
-    //cout << "joint2 position: \n" << outerLinks.front()->getOuterJoint()->pos() << endl;
-    //cout << "joint3 position: \n" << endEffector->pos() << endl;
+
 }
 
 
 // Moves the skeleton up and down, obviously this is poorly named..
 // we'll work on that.
-void Scene::moveSkeleton(float f) {
+void Scene::moveSkeleton(double f) {
     // IK can only solve for the end effector, so we want to find the last
     // element and move it.
-    delta.y() = f;
+    delta.y() += f;
     
     // TODO: We're just using the firstmost link for now this is obviously
     // not a real solution.
@@ -150,9 +147,9 @@ void Scene::moveSkeleton(float f) {
     cout << "-------------------------------\n delta\n" << delta << endl;
     
     cout << "before IK\n" << endEffector->pos() <<endl;
-    Vector3f goalPosition = endEffector->pos() + delta;
-    cout << "goalPosition\n" << goalPosition << endl;
-    Kinematics::solveIK(endEffector->getInnerLink(), goalPosition);
+    //Vector3f goalPosition = endEffector->pos() + delta;
+    cout << "goalPosition\n" << delta << endl;
+    Kinematics::solveIK(endEffector->getInnerLink(), delta);
     cout << "final position\n" << endEffector->pos() << endl;
 }
 

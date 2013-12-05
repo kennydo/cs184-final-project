@@ -31,7 +31,7 @@ class MouseToWorldConverter {
 
 class Scene {
     private:
-        Vector3f delta; //testing IK
+        Vector3d delta; //testing IK
         GLuint pickBuffer[PICK_BUFFER_SIZE];
         GLenum renderMode; // either GL_RENDER or GL_SELECT
         Joint *root, *endEffector;
@@ -56,8 +56,8 @@ class Scene {
         void drawLink(Link);
         void drawSkeleton();
 
-        void rotateSkeleton(float);
-        void moveSkeleton(float);
+        void rotateSkeleton(double);
+        void moveSkeleton(double);
 
         void onMouseMotion(int, int);
         void onLeftClick(int, int);
