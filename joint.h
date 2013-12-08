@@ -54,6 +54,14 @@ public:
     
     void moveJoint(Vector3f pos) { pos_ = pos; }
     void updateAngle(float theta) { theta_ = theta; }
+    
+    void updateLink(Link link) {
+        length_ = link.getLength();
+        theta_ = link.getAngle();
+        pos_ = link.pos();
+        l0_ = link.getInnerLink();
+        l1_ = link.getOuterLinks();
+    }
 };
 
 /*

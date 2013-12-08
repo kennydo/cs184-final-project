@@ -21,19 +21,25 @@ int main(int argc, char* argv[])
     Vector3f origin ( 0.0, 0.0, 0.0 );
     Vector3f p1 ( 0.0, 4.0, 0.0 );
     Vector3f p2 ( 4.0, 4.0, 0.0 );
+    Vector3f p3 ( 4.0, 2.0, 0.0 );
     
     Link l1 = Link(4, 0, p1);
     Link l2 = Link(4, PI/2, p2);
+    Link l3 = Link(2, PI/2, p3);
     
     l1.addOuterLink(1);
     l2.addInnerLink(0);
+    l2.addOuterLink(2);
+    l3.addInnerLink(1);
     
     vector<Link> path;
     path.push_back(l1);
     path.push_back(l2);
+    path.push_back(l3);
 
     Kinematics k = Kinematics(origin, path);
     scene->addKinematics(k);
+    scene->addEndEffector(2);
 
     glutInit(&argc, argv);
 

@@ -22,11 +22,14 @@ public:
 
     // The link that is passed in must be an end-effector,
     // ie. link.getOuterJoint().getOuterLink().size() == 0. This method will assert this.
-    /*static void solveIK(Link *link, Vector3d delta);
+    Vector3f getNewPosition(VectorXf d0_step, vector<Link> &path); 
+    bool reachedGoal(Vector3f goalPosition, Link link, float &distance);
+    void solveIK(Link *link, Vector3f delta);
 
     // It would make sense to use eigen matrix for this, unfortunately, we don't know how big our
     // matrix will be so instread we return a std::vector of Vector3fs.
-    static MatrixXd jacobian(vector<Link*> &path, vector<float> &thetas, vector<float> &lengths);*/
+    float sumAngles(vector<Link> &path, unsigned int i, unsigned int j);
+    MatrixXf jacobian(vector<Link> &path);
     friend class Scene;
 };
 

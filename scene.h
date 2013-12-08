@@ -43,11 +43,13 @@ class Scene {
         MouseToWorldConverter *converter;
         
         Kinematics k;
+        int endEffector;
         Vector3f delta;
     public:
         Scene();
         
         void addKinematics(Kinematics);
+        void addEndEffector(int);
 
         void refreshCamera(int, int);
         void draw();
@@ -57,7 +59,7 @@ class Scene {
         void drawSkeleton();
 
         void rotateSkeleton(float);
-        //void moveSkeleton(double);
+        void moveSkeleton(float);
 
         void onMouseMotion(int, int);
         void onLeftClick(int, int);

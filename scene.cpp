@@ -23,6 +23,10 @@ void Scene::addKinematics(Kinematics kinematics) {
     k = kinematics;
 }
 
+void Scene::addEndEffector(int i) {
+    endEffector = i;
+}
+
 void Scene::refreshCamera(int mouseX, int mouseY){
     // the x and y are where the click happened.
     // when the renderMode isn't GL_SELECT, those values aren't used for anything
@@ -123,27 +127,18 @@ void Scene::drawSkeleton() {
 void Scene::rotateSkeleton(float f) {
     
     float theta = f*3.14159/180;
-    k.solveFK(k.path_.front(), theta);
-    
+    k.solveFK(k.path_[1], theta);
 
 }
-/*
 
 // Moves the skeleton up and down, obviously this is poorly named..
 // we'll work on that.
-void Scene::moveSkeleton(double f) {
+void Scene::moveSkeleton(float f) {
     // IK can only solve for the end effector, so we want to find the last
     // element and move it.
     delta.y() += f;
-    
-    cout << "-------------------------------\n delta\n" << delta << endl;
-    
-    cout << "before IK\n" << endEffector->pos() <<endl;
-    //Vector3f goalPosition = endEffector->pos() + delta;
-    cout << "goalPosition\n" << delta << endl;
-    Kinematics::solveIK(endEffector->getInnerLink(), delta);
-    cout << "final position\n" << endEffector->pos() << endl;
-}*/
+    k.solveIK(&(k.path_[endEffector]), delta);
+}
 
 void Scene::onLeftClick(int mouseX, int mouseY) {
     /*

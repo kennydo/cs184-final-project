@@ -84,7 +84,7 @@ void Window::keyboard(unsigned char key, int x, int y) {
 }
 
 void Window::specialKeys(int key, int x, int y) {
-/*    switch(key) {
+    switch(key) {
         case GLUT_KEY_UP:
             printf("moving joint up\n");
             scene->moveSkeleton((double) 1);
@@ -93,7 +93,7 @@ void Window::specialKeys(int key, int x, int y) {
             printf("moving joint down\n");
             scene->moveSkeleton((double) -1);
             break;
-    }*/
+    }
 }
 
 void Window::mouse(int button, int state, int x, int y) {
