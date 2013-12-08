@@ -31,10 +31,8 @@ class MouseToWorldConverter {
 
 class Scene {
     private:
-        Vector3d delta; //testing IK
         GLuint pickBuffer[PICK_BUFFER_SIZE];
         GLenum renderMode; // either GL_RENDER or GL_SELECT
-        Joint *root, *endEffector;
         GLenum mouseButtonPressed;
         double mouseClickStartX, mouseClickStartY; // in world coordinates
         double mousePreviousX, mousePreviousY; // in world coordiantes
@@ -43,21 +41,23 @@ class Scene {
 
         void mouseToWorldCoordinates(int, int, double&, double&, double&);
         MouseToWorldConverter converter;
+        
+        Kinematics k;
+        Vector3f delta;
     public:
         Scene();
         
-        void addRootJoint(Joint*);
-        void addEndEffector(Joint*);
+        void addKinematics(Kinematics);
 
         void refreshCamera(int, int);
         void draw();
 
-        void drawGrid(float, float, float, float, float);
+        void drawGrid();//float, float, float, float, float);
         void drawLink(Link);
         void drawSkeleton();
 
-        void rotateSkeleton(double);
-        void moveSkeleton(double);
+        void rotateSkeleton(float);
+        //void moveSkeleton(double);
 
         void onMouseMotion(int, int);
         void onLeftClick(int, int);

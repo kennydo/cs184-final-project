@@ -5,51 +5,71 @@
 
 #include <Eigen/Core>
 #include <Eigen/SVD>
+#include <Eigen/Geometry>
 
 #include "kinematics.h"
 
 using namespace Eigen;
-//#define EPSILON 0.00000001
 
-/*
- * Given angle (in radians) of joint movement and link
- * calculates new position of joint and all outer joints
- */
- 
- void solveFKHelper(Link *link, double theta) {
-     
-    Joint *inner = link->getInnerJoint();
-    Joint *outer = link->getOuterJoint();
+void Kinematics::solveFKHelper(Link &link, float theta, Vector3f pos) {
+    float newTheta = link.getAngle() + theta;
+    float length = link.getLength();
+   
+    Vector3f newPos;
+    newPos.x() = pos.x() + length*sin(newTheta);
+    newPos.y() = pos.y() + length*cos(newTheta);
+    newPos.z() = 0;
+   
+   //link.updateAngle(newTheta);
+   link.moveJoint(newPos);
+   /*
+   cout << "new theta\t" << newTheta << "\t" << "lenghth" << endl;
+   cout << "old position\n" << pos << endl;
+   cout << "new position\n" << newPos << endl;
+   */
+    vector<int> outer = link.getOuterLinks();
     
-    double angle = link->getAngle() + theta;
-    double length = link->getLength();
-    
-    Vector3d v;
-    v.x() = (inner->pos()).x() + length*sin(angle);
-    v.y() = (inner->pos()).y() + length*cos(angle);
-    v.z() = 0.0;
-    
-    outer->moveJoint(v);
-    
-    vector<Link*> outerLinks = outer->getOuterLink();
-    
-    if ( outerLinks.size() > 0 ) {
-        for (unsigned int i = 0; i < outerLinks.size(); i++) {
-            solveFKHelper(outerLinks[i], angle);
+    if ( outer.size() > 0 ) {
+        for (unsigned int i = 0; i < outer.size(); i++) {
+            solveFKHelper(path_[outer[i]], newTheta, newPos);
         }
     }
-     
+    
+    
+    
  }
  
-void Kinematics::solveFK(Link* link, double theta) {
-    
-    double newTheta = link->getAngle() + theta;
-    
-    link->updateAngle(newTheta);
-    solveFKHelper(link, 0);
+void Kinematics::solveFK(Link &link, float theta) {
    
+   //update angle for ONLY the link affected
+   float newTheta = link.getAngle() + theta;
+   link.updateAngle(newTheta);
+   
+   solveFKHelper(link, 0, origin_);
+   
+   
+   /*float length = link.getLength();
+   
+   Vector3f newPos;
+   newPos.x() = pos.x() + length*sin(newTheta);
+   newPos.y() = pos.y() + length*cos(newTheta);
+   newPos.z() = 0;
+   
+   //update angle of joint directly affected
+   link.updateAngle(newTheta);
+   //move joint
+   link.moveJoint(newPos);
+   
+    vector<int> outer = link.getOuterLinks();
+    
+    if ( outer.size() > 0 ) {
+        for (unsigned int i = 0; i < outer.size(); i++) {
+            solveFKHelper(path_[outer[i]], 0, newPos);
+        }
+    }*/
 }
 
+/*
 
 // Compute pseudo inverse, logic from: http://eigen.tuxfamily.org/bz/show_bug.cgi?id=257
 template<typename _Matrix_Type_>
@@ -103,9 +123,6 @@ bool reachedGoal(Vector3d goalPosition, Link * link, double &distance) {
 
     if (abs(distance)<2.0*numeric_limits<double>::epsilon()) {
         printf("GOAL REACHED\n");
-        /*cout << "goal position\n" << goalPosition << endl;
-        cout << "outer joint pos\n" << link->getOuterJoint()->pos() << endl;
-        printf("distance: %f\n", distance);*/
         return true;
     }
     return false;
@@ -167,6 +184,7 @@ void Kinematics::solveIK(Link *link, Vector3d goalPosition) {
             }
             Kinematics::solveIK(path.back(), goalPosition);
         } else if (step/2 > 0) {
+            cout << "step\t" << step << endl;
             step = step/2;
         } else {
             //cout << "step size too small" << endl;
@@ -206,4 +224,4 @@ MatrixXd Kinematics::jacobian(vector<Link*> &path, vector<double> &thetas, vecto
     }
 
     return toReturn.transpose();
-}
+}*/

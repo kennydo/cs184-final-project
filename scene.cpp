@@ -1,10 +1,10 @@
 #include "scene.h"
 #include <cstdio>
 #include <iostream>
+#include <cmath>
 
 Scene::Scene(){
     // initialize variables
-    delta = Vector3d(0, 0, 0);
     renderMode = GL_RENDER;
     mouseButtonPressed = 0;
     translateX = 0;
@@ -12,14 +12,11 @@ Scene::Scene(){
 
     mousePreviousX = 0;
     mousePreviousY = 0;
+    delta = Vector3f(0, 0, 0);
 }
 
-void Scene::addRootJoint(Joint *j) {
-    root = j;
-}
-
-void Scene::addEndEffector(Joint *j) {
-    endEffector = j;
+void Scene::addKinematics(Kinematics kinematics) {
+    k = kinematics;
 }
 
 void Scene::refreshCamera(int mouseX, int mouseY){
@@ -27,7 +24,6 @@ void Scene::refreshCamera(int mouseX, int mouseY){
     // when the renderMode isn't GL_SELECT, those values aren't used for anything
     // so just pass in dummy 0,0
     int viewport[4];
-
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
     GLfloat light_pos[4] = {0.0, 0.0, -1.0, 0.0};
@@ -35,8 +31,8 @@ void Scene::refreshCamera(int mouseX, int mouseY){
 
     glTranslatef(translateX, translateY, 0);
 
-   glRotatef(30, 1, 0, 0);
-   glRotatef(30, 0, 1, 0);
+   //glRotatef(30, 1, 0, 0);
+   //glRotatef(30, 0, 1, 0);
 
 
     // we'll probably want to use AABB and figure out scaling
@@ -63,70 +59,71 @@ void Scene::draw(){
     glPushName(0);
     glLoadName(67); // a distinct-looking name for debugging purposes
     drawSkeleton();
+    drawGrid();
 
 }
 
-void Scene::drawGrid(float xMin, float xMax, float zMin, float zMax, float step){
-    float x, z;
-    glColor3f(1.0, 1.0, 1.0);
-    for(x=xMin; x <= xMax; x += step){
-        glBegin(GL_LINES);
-        glVertex3f(x, 0, zMin);
-        glVertex3f(x, 0, zMax);
-        glEnd();
-    }
-
-    for(z = zMin; z <= zMax; z += step){
-        glBegin(GL_LINES);
-        glVertex3f(xMin, 0, z);
-        glVertex3f(xMax, 0, z);
-        glEnd();
-    }
-}
-
-void Scene::drawLink(Link link) {
-    Joint *j1 = link.getInnerJoint();
-    Joint *j2 = link.getOuterJoint();
+void Scene::drawGrid() {
     
-    Vector3d p1 = j1->pos();
-    Vector3d p2 = j2->pos();
+    glPushAttrib(GL_ENABLE_BIT); 
     
-    //printf("vector 1 x: %f y: %f z: %f\n", p1.x(), p1.y(), p1.z());
-    //printf("vector 2 x: %f y: %f z: %f\n", p2.x(), p2.y(), p2.z());
-    
-    glColor3f(1.0, 1.0, 1.0);
+    glLineStipple(1, 0xAAAA);
+    glEnable(GL_LINE_STIPPLE);
+    glColor3f(0.0, 0.0, 1.0);
     glBegin(GL_LINES);
-    glVertex3f(p1.x(), p1.y(), p1.z());
-    glVertex3f(p2.x(), p2.y(), p2.z());
+    glVertex3f(-100, 0, 0);
+    glVertex3f(100, 0, 0);
     glEnd();
     
-    vector<Link*> outerLinks = j2->getOuterLink();
+    glBegin(GL_LINES);
+    glVertex3f(0, -100, 0);
+    glVertex3f(0, 100, 0);
+    glEnd();
     
-    if ( outerLinks.size() > 0 ) {
-        for (unsigned int i = 0; i < outerLinks.size(); i++) {
-            drawLink(*outerLinks[i]);
-        }
-    }
+    glBegin(GL_LINES);
+    glVertex3f(0, 0, -100);
+    glVertex3f(0, 0, 100);
+    glEnd();
+    
+    glPopAttrib();
 }
 
 void Scene::drawSkeleton() {
-    vector<Link*> outerLinks = root->getOuterLink();
-    if ( outerLinks.size() > 0 ) {
-        for (unsigned int i = 0; i < outerLinks.size(); i++) {
-            drawLink(*outerLinks[i]);
+    Vector3f p1, p2;
+    Link link;
+    
+    for (unsigned int i = 0; i < k.path_.size(); i++) {
+        link = (k.path_)[i];
+        
+        //if root link, then first point is origin
+        if (link.getInnerLink() == -1)  {
+            p1 = k.origin_;
+        } else { // otherwise first point is inner link's position
+            p1 = (k.path_[(link.getInnerLink())]).pos();
         }
+        
+        //second point is just current link's position
+        p2 = link.pos();
+    
+        //draw the link
+        glColor3f(1.0, 1.0, 1.0);
+        glBegin(GL_LINES);
+        glVertex3f(p1.x(), p1.y(), p1.z());
+        glVertex3f(p2.x(), p2.y(), p2.z());
+        glEnd();
+    
     }
     
 }
 
-void Scene::rotateSkeleton(double f) {
-    double theta = f*3.14159/180;
+void Scene::rotateSkeleton(float f) {
     
-    vector<Link*> outerLinks = root->getOuterLink();
-    Kinematics::solveFK(outerLinks.front(), theta);
+    float theta = f*3.14159/180;
+    k.solveFK(k.path_.front(), theta);
+    
 
 }
-
+/*
 
 // Moves the skeleton up and down, obviously this is poorly named..
 // we'll work on that.
@@ -135,15 +132,6 @@ void Scene::moveSkeleton(double f) {
     // element and move it.
     delta.y() += f;
     
-    // TODO: We're just using the firstmost link for now this is obviously
-    // not a real solution.
-    /*Link *current = root->getOuterLink()[0];
-    Joint *j = current->getOuterJoint();
-    while(j->getOuterLink().size() == 0) {
-        current = j->getOuterLink()[0];
-        j = current->getOuterJoint();
-    }*/
-    
     cout << "-------------------------------\n delta\n" << delta << endl;
     
     cout << "before IK\n" << endEffector->pos() <<endl;
@@ -151,7 +139,7 @@ void Scene::moveSkeleton(double f) {
     cout << "goalPosition\n" << delta << endl;
     Kinematics::solveIK(endEffector->getInnerLink(), delta);
     cout << "final position\n" << endEffector->pos() << endl;
-}
+}*/
 
 void Scene::onLeftClick(int mouseX, int mouseY) {
     /*

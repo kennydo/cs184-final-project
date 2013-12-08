@@ -12,35 +12,28 @@
 #include "window.h"
 #include "scene.h"
 
-
+const double PI = 4.0*atan(1.0);
 
 int main(int argc, char* argv[])
 {
     Scene* scene = new Scene();
     
-    Vector3d p1 ( 0.0, 0.0, 0.0 );
-    Vector3d p2 ( 0.0, 4.0, 0.0 );
-    Vector3d p3 ( 4.0, 4.0, 0.0 );
+    Vector3f origin ( 0.0, 0.0, 0.0 );
+    Vector3f p1 ( 0.0, 4.0, 0.0 );
+    Vector3f p2 ( 4.0, 4.0, 0.0 );
     
-    Joint j1 = Joint(p1);
-    Joint j2 = Joint(p2);
-    Joint j3 = Joint(p3);
+    Link l1 = Link(4, 0, p1);
+    Link l2 = Link(4, PI/2, p2);
     
-    Link L12 = Link(4, 0);
-    Link L23 = Link(4, 3.14159/2);
+    l1.addOuterLink(1);
+    l2.addInnerLink(0);
+    
+    vector<Link> path;
+    path.push_back(l1);
+    path.push_back(l2);
 
-    j1.addOuterLink(&L12);
-    j2.addInnerLink(&L12);
-    j2.addOuterLink(&L23);
-    j3.addInnerLink(&L23);
-    
-    L12.addInnerJoint(&j1);
-    L12.addOuterJoint(&j2);
-    L23.addInnerJoint(&j2);
-    L23.addOuterJoint(&j3);
-
-    scene->addRootJoint(&j1);
-    scene->addEndEffector(&j3);
+    Kinematics k = Kinematics(origin, path);
+    scene->addKinematics(k);
 
     glutInit(&argc, argv);
 
