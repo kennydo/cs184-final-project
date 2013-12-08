@@ -40,7 +40,7 @@ class Scene {
         double translateX, translateY; // in world coordinates
 
         void mouseToWorldCoordinates(int, int, double&, double&, double&);
-        MouseToWorldConverter converter;
+        MouseToWorldConverter *converter;
         
         Kinematics k;
         Vector3f delta;

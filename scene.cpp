@@ -13,6 +13,10 @@ Scene::Scene(){
     mousePreviousX = 0;
     mousePreviousY = 0;
     delta = Vector3f(0, 0, 0);
+    
+    // When the scene is initialized the GL params aren't
+    // set yet and this will cause a segfault
+    converter = NULL;
 }
 
 void Scene::addKinematics(Kinematics kinematics) {
@@ -147,10 +151,12 @@ void Scene::onLeftClick(int mouseX, int mouseY) {
      * x=0 is left side of the screen and
      * y=0 is the bottom of the screen
      */
-    converter = MouseToWorldConverter();
+    if(converter != NULL)
+        delete converter;
+    converter = new MouseToWorldConverter();
 
     double x, y, z;
-    converter.convert(mouseX, mouseY, x, y, z);
+    converter->convert(mouseX, mouseY, x, y, z);
     mouseClickStartX = x;
     mouseClickStartY = y;
     mousePreviousX = mouseClickStartX;
@@ -178,8 +184,8 @@ void Scene::onLeftClick(int mouseX, int mouseY) {
     float zMin, zMax;
     // we only care about the first hit for now
     numItems = pickBuffer[0];
-    zMin = pickBuffer[1] / (pow(2, 32) - 1.0);
-    zMax = pickBuffer[2] / (pow(2, 32) - 1.0);
+    zMin = pickBuffer[1] / (pow(2.0, 32.0) - 1.0);
+    zMax = pickBuffer[2] / (pow(2.0, 32.0) - 1.0);
     printf("numItems: %d\nzMin: %f\nzMax: %f\n",
            numItems, zMin, zMax);
     for(unsigned int j=0; j<numItems; j++){
@@ -191,7 +197,7 @@ void Scene::onLeftClick(int mouseX, int mouseY) {
 
 void Scene::onLeftRelease(int mouseX, int mouseY) {
     double x, y, z;
-    converter.convert(mouseX, mouseY, x, y, z);
+    converter->convert(mouseX, mouseY, x, y, z);
     printf("Scene::onLeftRelease called with x=%f, y=%f\n", x, y);
     mouseButtonPressed = 0;
 }
@@ -201,7 +207,7 @@ void Scene::onMouseMotion(int mouseX, int mouseY) {
 
 
     double x, y, z;
-    converter.convert(mouseX, mouseY, x, y, z);
+    converter->convert(mouseX, mouseY, x, y, z);
 
     double dX = x - mouseClickStartX;
     double dY = y - mouseClickStartY;
