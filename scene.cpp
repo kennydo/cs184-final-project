@@ -37,7 +37,6 @@ void Scene::refreshCamera(int mouseX, int mouseY){
     GLfloat light_pos[4] = {0.0, 0.0, -1.0, 0.0};
     glLightfv(GL_LIGHT0, GL_POSITION, light_pos);
 
-    glTranslatef(translateX, translateY, 0);
 
    //glRotatef(30, 1, 0, 0);
    //glRotatef(30, 0, 1, 0);
@@ -60,6 +59,7 @@ void Scene::refreshCamera(int mouseX, int mouseY){
             -0.6, 0.6,
             -1.0, 1.0);
 
+    glTranslatef(translateX * 0.05, translateY * 0.05, 0);
 }
 
 void Scene::draw(){
