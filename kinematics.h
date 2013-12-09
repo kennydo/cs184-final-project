@@ -24,6 +24,7 @@ public:
     // ie. link.getOuterJoint().getOuterLink().size() == 0. This method will assert this.
     Vector3f getNewPosition(VectorXf d0_step, vector<Link> &path); 
     bool reachedGoal(Vector3f goalPosition, Link link, float &distance);
+    void takeStep(VectorXf d0_step, vector<Link> &path);
     void solveIK(Link *link, Vector3f delta);
 
     // It would make sense to use eigen matrix for this, unfortunately, we don't know how big our

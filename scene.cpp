@@ -127,7 +127,7 @@ void Scene::drawSkeleton() {
 void Scene::rotateSkeleton(float f) {
     
     float theta = f*3.14159/180;
-    k.solveFK(k.path_[1], theta);
+    k.solveFK(k.path_[0], theta);
 
 }
 
@@ -137,6 +137,8 @@ void Scene::moveSkeleton(float f) {
     // IK can only solve for the end effector, so we want to find the last
     // element and move it.
     delta.y() += f;
+    
+    cout << "TARGET POSITION\n" << delta << endl;
     k.solveIK(&(k.path_[endEffector]), delta);
 }
 
