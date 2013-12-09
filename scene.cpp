@@ -133,10 +133,12 @@ void Scene::rotateSkeleton(float f) {
 
 // Moves the skeleton up and down, obviously this is poorly named..
 // we'll work on that.
-void Scene::moveSkeleton(float f) {
+void Scene::moveSkeleton(float x, float y, float z) {
     // IK can only solve for the end effector, so we want to find the last
     // element and move it.
-    delta.y() += f;
+    delta.x() += x;
+    delta.y() += y;
+    delta.z() += z;
     
     cout << "TARGET POSITION\n" << delta << endl;
     k.solveIK(&(k.path_[endEffector]), delta);

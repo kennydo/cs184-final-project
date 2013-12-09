@@ -59,7 +59,7 @@ class Scene {
         void drawSkeleton();
 
         void rotateSkeleton(float);
-        void moveSkeleton(float);
+        void moveSkeleton(float x, float y, float z);
 
         void onMouseMotion(int, int);
         void onLeftClick(int, int);
