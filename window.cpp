@@ -1,5 +1,8 @@
 #include "window.h"
 #include <cstdio>
+#include <Eigen/Geometry>
+
+const double PI = 4.0*atan(1.0);
 
 int Window::width = 0;
 int Window::height = 0;
@@ -68,14 +71,39 @@ void Window::idle(){
 
 void Window::keyboard(unsigned char key, int x, int y) {
     switch(key) {
-        case '+':
-            printf("rotate joint clockwise\n");
-            scene->rotateSkeleton((double) 45);
+        case 'w':
+        {
+            printf("rotate joint clockwise around x axis\n");
+            Quaternionf q(sqrt(0.5), sqrt(0.5), 0, 0);
+            //Quaternionf q(sqrt(0.5), 0, sqrt(0.5), 0);
+            //Quaternionf q(-sqrt(0.5), 0, 0, sqrt(0.5));
+            scene->rotateSkeleton(q);
+        }
             break;
-        case '-':
-            printf("rotate joint counterclockwise\n");
-            scene->rotateSkeleton((double) -45);
+        case 's':
+        {
+            printf("rotate joint counterclockwise around x axis\n");
+            Quaternionf q(-sqrt(0.5), sqrt(0.5), 0, 0);
+            //Quaternionf q(sqrt(0.5), 0, sqrt(0.5), 0);
+            //Quaternionf q(sqrt(0.5), 0, 0, sqrt(0.5));
+            scene->rotateSkeleton(q);
+        }
             break;
+        case 'a':
+        {
+            printf("rotate joint clockwise around z axis\n");
+            Quaternionf q(sqrt(0.5), 0, 0, sqrt(0.5));
+            scene->rotateSkeleton(q);
+        }
+            break;
+        case 'd':
+        {
+            printf("rotate joint counterclockwise around z axis\n");
+            Quaternionf q(-sqrt(0.5), 0, 0, sqrt(0.5));
+            scene->rotateSkeleton(q);
+        } 
+            break;
+            
         case ' ':
             printf("quitting\n");
             exit(0);

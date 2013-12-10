@@ -13,26 +13,34 @@ using namespace Eigen;
 
 #define EPSILON 0.00000001
 
+
+void printQuaternion(Quaternionf q) {
+    
+    printf("quaternion: x: %f y: %f z: %f w: %f\n", q.x(), q.y(), q.z(), q.w());
+    
+}
+/*
 // pos = position of parent link
 // theta = sum of all angles of parents
 // link = current link we're solving the angle for
-void Kinematics::solveFKHelper(Link &link, float theta, Vector3f pos) {
+void Kinematics::solveFKHelper(Link &link, Quaternionf theta, Vector3f pos) {
     
-    float newTheta = link.getAngle() + theta;
-    float length = link.getLength();
+    Quaternionf newTheta = link.getAngle()*theta;
+    //float length = link.getLength();
+    printf("new theta\n");
+    printQuaternion(newTheta);
+    
+    cout << "OLD POSITION\n" << pos << endl;
    
-    Vector3f newPos;
-    newPos.x() = pos.x() + length*sin(newTheta);
-    newPos.y() = pos.y() + length*cos(newTheta);
-    newPos.z() = 0;
+    Vector3f newPos = newTheta._transformVector(link.pos());
+    newPos += pos;
+    cout << "NEW POSITION\n" << newPos << endl;
+    
+    //newPos.x() = pos.x() + length*sin(newTheta);
+    //newPos.y() = pos.y() + length*cos(newTheta);
+    //newPos.z() = 0;
    
    link.moveJoint(newPos);
-   //printf("LINK ANGLE: %f THETA: %f\n", link.getAngle(), theta);
-   //printf("NEW X: %f POSX: %f LENGTH: %f SIN(NEWTHETA): %f NEWTHETA: %f\n", newPos.x(), pos.x(), length, sin(newTheta), newTheta);
-   //printf("NEW Y: %f POSY: %f LENGTH: %f COS(NEWTHETA): %f NEWTHETA: %f\n", newPos.y(), pos.y(), length, cos(newTheta), newTheta);
-   
-   //printf("NEW POSITION:\n");
-   cout << newPos << endl;
    
    vector<int> outer = link.getOuterLinks();
     
@@ -42,23 +50,62 @@ void Kinematics::solveFKHelper(Link &link, float theta, Vector3f pos) {
         }
     }
     
+}*/
+
+void Kinematics::solveFKHelper(Link &link, Quaternionf theta, Vector3f g) {
+    
+    Vector3f p_g = link.pos() - g;
+    Vector3f translated = theta._transformVector(p_g);
+    link.moveJoint(translated + g);
+    
+    vector<int> outer = link.getOuterLinks();
+    
+    if ( outer.size() > 0 ) {
+        for (unsigned int i = 0; i < outer.size(); i++) {
+            solveFKHelper(path_[outer[i]], theta, g);
+        }
+    }
+    
 }
 
-void Kinematics::solveFK(Link &link, float theta) {
-    //printf("SOLVING FOR THETA: %f\n", theta);
+void Kinematics::solveFK(Link &link, Quaternionf theta) {
+    
+    // http://math.stackexchange.com/questions/18382/quaternion-and-rotation-about-an-origin-and-an-arbitrary-axis-origin-help
+    // to use quaternion Q to rotate point P with respect to translated origin G: P' = Q(P-G)Q' + G
     
     
+    Vector3f g;
+    if (link.getInnerLink() == -1) {
+        g = origin_;
+    } else {
+        g = path_[link.getInnerLink()].pos();
+    }
+    
+    solveFKHelper(link, theta, g);
+    
+    
+    /*printf("--------------------------------------------SOLVING FK ---------------------------------------\n");
+    printf("theta\n");
+    printQuaternion(theta);
     
     //update angle of link moved
-    float newTheta = link.getAngle() + theta;
+    Quaternionf newTheta = link.getAngle()*theta;
+    printf("link angle\n");
+    printQuaternion(link.getAngle());
     link.updateAngle(newTheta);
-    
+    printf("NEW THETA\n");
+    printQuaternion(newTheta);
     //in order to get final position of link we have to sum
     //up all of the thetas from the root to the current link
     Link current = link;
-    float sumTheta = 0;
+    Quaternionf sumTheta;
+    sumTheta.setIdentity();
+    
+    // watch out for the order by which we're multiplying quaternions
+    // to rotate a vector v by quaternion q then q'
+    // (v^q)^q' = ((qq')^-1)*v*(qq')
     while (current.getInnerLink() != -1) {
-        sumTheta+= path_[current.getInnerLink()].getAngle();
+        sumTheta *= path_[current.getInnerLink()].getAngle();
         current = path_[current.getInnerLink()];
     }
     
@@ -70,13 +117,9 @@ void Kinematics::solveFK(Link &link, float theta) {
         position = path_[link.getInnerLink()].pos();
     }
     
-    //printf("sumTheta: %f\n", sumTheta);
-    //printf("position of previous\n");
-    //cout << position << endl;
-    
-    solveFKHelper(link, sumTheta, position);
+    solveFKHelper(link, sumTheta, position);*/
 }
-
+/*
 // Compute pseudo inverse, logic from: http://eigen.tuxfamily.org/bz/show_bug.cgi?id=257
 template<typename _Matrix_Type_>
 bool pseudoInverse(const _Matrix_Type_ &a, _Matrix_Type_ &result, double epsilon = std::numeric_limits<double>::epsilon())
@@ -265,4 +308,4 @@ MatrixXf Kinematics::jacobian(vector<Link> &path)
     }
 
     return toReturn.transpose();
-}
+}*/

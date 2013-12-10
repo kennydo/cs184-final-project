@@ -3,30 +3,10 @@
 
 #include <vector>
 #include <Eigen/Core>
+#include <Eigen/Geometry>
 
 using namespace std;
 using namespace Eigen;
-
-/*class Link;
-
-class Joint
-{
-private:
-    Vector3d pos_;
-    Link *l0_; //inner link
-    vector<Link*> l1_; //outer link(s)
-    
-public:
-    Joint(Vector3d position) : pos_(position), l0_(NULL) {}
-
-    void addInnerLink(Link *inner) { l0_ = inner; }
-    void addOuterLink(Link *outer) { l1_.push_back(outer); }
-
-    Vector3d pos() { return pos_; }
-    Link* getInnerLink() { return l0_; }
-    vector<Link*> getOuterLink() { return l1_; }
-    void moveJoint(Vector3d newPosition) { pos_ = newPosition; }
-};*/
 
 class Link
 {
@@ -35,13 +15,11 @@ private:
     Vector3f pos_;
     int l0_;
     vector<int> l1_;
-    
-    //Quaternionf unit;
-    //Quaternionf worldOrient;
+    Quaternionf angle_;
     
 public:
     Link() {}
-    Link(float length, float theta, Vector3f position) : length_(length), theta_(theta), pos_(position), l0_(-1) {}
+    Link(float length, Vector3f pos, Quaternionf angle) : length_(length), pos_(pos), angle_(angle), l0_(-1) {}
     
     void addInnerLink(int inner) { l0_ = inner; }
     void addOuterLink(int outer) { l1_.push_back(outer); }
@@ -50,27 +28,18 @@ public:
     
     Vector3f pos() { return pos_; }
     float getLength() { return length_; }
-    float getAngle() { return theta_; }
+    Quaternionf getAngle() { return angle_; }
     
     void moveJoint(Vector3f pos) { pos_ = pos; }
-    void updateAngle(float theta) { theta_ = theta; }
+    void updateAngle(Quaternionf angle) { angle_ = angle; }
     
     void updateLink(Link link) {
         length_ = link.getLength();
-        theta_ = link.getAngle();
         pos_ = link.pos();
         l0_ = link.getInnerLink();
         l1_ = link.getOuterLinks();
+        angle_ = link.getAngle();
     }
 };
-
-/*
-class Body
-{
-private: 
-    vector<Link> path_;
-public:
-    friend Kinematics
-};*/
 
 #endif

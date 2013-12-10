@@ -11,6 +11,7 @@
 
 #include <math.h>
 #include <Eigen/Core>
+#include <Eigen/Geometry>
 
 #include "joint.h"
 #include "kinematics.h"
@@ -58,7 +59,7 @@ class Scene {
         void drawLink(Link);
         void drawSkeleton();
 
-        void rotateSkeleton(float);
+        void rotateSkeleton(Quaternionf);
         void moveSkeleton(float x, float y, float z);
 
         void onMouseMotion(int, int);

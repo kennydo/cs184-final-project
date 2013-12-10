@@ -6,10 +6,12 @@
 #include <GL/glu.h>
 #endif
 
+#include <Eigen/Geometry>
+#include <math.h>
 #include <stdio.h>
 #include "joint.h"
 #include "kinematics.h"
-#include "objparser.h"
+//#include "objparser.h"
 #include "window.h"
 #include "scene.h"
 
@@ -17,13 +19,14 @@ const double PI = 4.0*atan(1.0);
 
 int main(int argc, char* argv[])
 {
+    /*
     if(argc >= 2){
         printf("Attempting to parse obj file input\n");
         ParsedObj* obj = ObjParser::parse(argv[1]);
         printf("Completed parsing\n");
     } else {
         printf("No .obj file passed in\n");
-    }
+    }*/
 
     Scene* scene = new Scene();
     
@@ -32,9 +35,20 @@ int main(int argc, char* argv[])
     Vector3f p2 ( 4.0, 4.0, 0.0 );
     Vector3f p3 ( 4.0, 2.0, 0.0 );
     
-    Link l1 = Link(4, 0, p1);
-    Link l2 = Link(4, PI/2, p2);
-    Link l3 = Link(2, PI/2, p3);
+    Quaternionf q1(1, 0, 0, 0);
+    //Quaternionf q2(1, 0, 0, 0);
+    //Quaternionf q2(sqrt(0.5), sqrt(0.5), 0, 0);
+    //Quaternionf q2(sqrt(0.5), 0, sqrt(0.5), 0);
+    Quaternionf q2(sqrt(0.5), 0, 0, sqrt(0.5));
+    
+    //Quaternionf q3(1, 0, 0, 0);
+    //Quaternionf q3(sqrt(0.5), sqrt(0.5), 0, 0);
+    //Quaternionf q3(sqrt(0.5), 0, sqrt(0.5), 0);
+    Quaternionf q3(sqrt(0.5), 0, 0, sqrt(0.5));
+    
+    Link l1 = Link(4, p1, q1);
+    Link l2 = Link(4, p2, q2);
+    Link l3 = Link(2, p3, q3);
     
     l1.addOuterLink(1);
     l2.addInnerLink(0);
