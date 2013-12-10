@@ -3,40 +3,55 @@
 using namespace Eigen;
 
 ParsedObj::ParsedObj(){
-    // nothing for now
+    scale = 1.0;
 }
 
-void ParsedObj::centerAndScale(){
+void ParsedObj::centerAndScale(float s){
     /* centers the obj's vertices about the origin
      * and then scales them so that the furthest vertex
-     * has a distance of 1 from the origin */
+     * has a distance of 's' from the origin */
     if(vertices.size() < 1){ return; }
 
-    Eigen::Vector3f* minVertex = vertices[0];
-    Eigen::Vector3f* maxVertex = vertices[0];
+    Eigen::Vector3f minVertex = *vertices[0];
+    Eigen::Vector3f maxVertex = *vertices[0];
     Eigen::Vector3f* iterVertex;
 
     for(unsigned int i=0; i<vertices.size(); i++){
         iterVertex = vertices[i];
-        if(iterVertex->minCoeff() < minVertex->minCoeff()){
-            minVertex = iterVertex;
+        if(iterVertex->x() < minVertex.x()){
+            minVertex.x() = iterVertex->x();
         }
-        if(iterVertex->maxCoeff() > maxVertex->maxCoeff()){
-            maxVertex = iterVertex;
+        if(iterVertex->y() < minVertex.y()){
+            minVertex.y() = iterVertex->y();
+        }
+        if(iterVertex->z() < minVertex.z()){
+            minVertex.z() = iterVertex->z();
+        }
+        if(iterVertex->x() > maxVertex.x()){
+            maxVertex.x() = iterVertex->x();
+        }
+        if(iterVertex->y() > maxVertex.y()){
+            maxVertex.y() = iterVertex->y();
+        }
+        if(iterVertex->z() > maxVertex.z()){
+            maxVertex.z() = iterVertex->z();
         }
     }
-    center = (*minVertex + *maxVertex) * 0.5;
-    Eigen::Vector3f size = *maxVertex - *minVertex;
+    center = (minVertex + maxVertex) * 0.5;
+    Eigen::Vector3f size = maxVertex - minVertex;
 
-    scale = size.maxCoeff();
+    sizeMultiplier = 1.0f / size.maxCoeff();
+    scale = sizeMultiplier * s * 2;
 
     for(unsigned int i=0; i<vertices.size(); i++){
         iterVertex = vertices[i];
 
         *iterVertex -= center;
-        *iterVertex /= scale;
+        *iterVertex *= scale;
     }
+
     printf("Center found at: %f %f %f\n", center.x(), center.y(), center.z());
+    printf("sizeMultiplier: %f\n", sizeMultiplier);
     printf("Scaling by: %f\n", scale);
 }
 

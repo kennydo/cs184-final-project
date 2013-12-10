@@ -23,9 +23,10 @@ class ParsedObj {
         std::vector<ObjFace*> faces;
 
         Eigen::Vector3f center;
+        float sizeMultiplier;
         float scale;
 
-        void centerAndScale();
+        void centerAndScale(float);
 };
 
 class ObjParser {

@@ -9,7 +9,7 @@ Scene::Scene(ParsedObj* o){
     mouseButtonPressed = 0;
     translateX = 0;
     translateY = 0;
-    scaleFactor = 0.1;
+    scaleFactor = 1.0;
 
     mousePreviousX = 0;
     mousePreviousY = 0;
@@ -260,11 +260,11 @@ void Scene::onMouseMotion(int mouseX, int mouseY) {
 }
 
 void Scene::onZoomIn(){
-    scaleFactor += 0.01;
+    scaleFactor += 0.05;
 }
 
 void Scene::onZoomOut(){
-    scaleFactor -= 0.01;
+    scaleFactor -= 0.05;
 }
 
 MouseToWorldConverter::MouseToWorldConverter(){

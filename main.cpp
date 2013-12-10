@@ -21,7 +21,7 @@ int main(int argc, char* argv[])
     if(argc >= 2){
         printf("Attempting to parse obj file input\n");
         obj = ObjParser::parse(argv[1]);
-        obj->centerAndScale();
+        obj->centerAndScale(3.0);
         printf("Completed parsing\n");
     } else {
         printf("No .obj file passed in\n");
