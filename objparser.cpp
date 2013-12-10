@@ -55,7 +55,6 @@ ParsedObj* ObjParser::parse(std::string filename){
                 ObjFace* face = new ObjFace(obj->vertices[vert1 - 1],
                                             obj->vertices[vert2 - 1],
                                             obj->vertices[vert3 - 1]);
-                printf("%f\n", face->normal->x());
                 obj->faces.push_back(face);
             }
 
