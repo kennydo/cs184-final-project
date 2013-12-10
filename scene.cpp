@@ -9,6 +9,7 @@ Scene::Scene(ParsedObj* o){
     mouseButtonPressed = 0;
     translateX = 0;
     translateY = 0;
+    scaleFactor = 0.1;
 
     mousePreviousX = 0;
     mousePreviousY = 0;
@@ -65,7 +66,7 @@ void Scene::refreshCamera(int mouseX, int mouseY){
     glOrtho(-0.6, 0.6,
             -0.6, 0.6,
             -1.0, 1.0);
-
+    glScalef(scaleFactor, scaleFactor, scaleFactor);
     glTranslatef(translateX * 0.05, translateY * 0.05, 0);
 }
 
@@ -256,6 +257,14 @@ void Scene::onMouseMotion(int mouseX, int mouseY) {
     }
     mousePreviousX = x;
     mousePreviousY = y;
+}
+
+void Scene::onZoomIn(){
+    scaleFactor += 0.01;
+}
+
+void Scene::onZoomOut(){
+    scaleFactor -= 0.01;
 }
 
 MouseToWorldConverter::MouseToWorldConverter(){
