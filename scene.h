@@ -39,6 +39,7 @@ class Scene {
         double mousePreviousX, mousePreviousY; // in world coordiantes
 
         double translateX, translateY; // in world coordinates
+        float scaleFactor;
 
         void mouseToWorldCoordinates(int, int, double&, double&, double&);
         MouseToWorldConverter *converter;
@@ -67,6 +68,9 @@ class Scene {
         void onMouseMotion(int, int);
         void onLeftClick(int, int);
         void onLeftRelease(int, int);
+
+        void onZoomIn();
+        void onZoomOut();
 };
 
 
