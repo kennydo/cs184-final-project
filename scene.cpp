@@ -3,17 +3,25 @@
 #include <iostream>
 #include <cmath>
 
-Scene::Scene(){
+Scene::Scene(ParsedObj* o){
     // initialize variables
     renderMode = GL_RENDER;
     mouseButtonPressed = 0;
     translateX = 0;
     translateY = 0;
+    scaleFactor = 1.0;
 
     mousePreviousX = 0;
     mousePreviousY = 0;
     delta = Vector3f(0, 0, 0);
-    
+
+    // just to be explicit about what obj is
+    if(o == NULL){
+        obj = NULL;
+    } else {
+        obj = o;
+    }
+
     // When the scene is initialized the GL params aren't
     // set yet and this will cause a segfault
     converter = NULL;
@@ -58,7 +66,7 @@ void Scene::refreshCamera(int mouseX, int mouseY){
     glOrtho(-0.6, 0.6,
             -0.6, 0.6,
             -1.0, 1.0);
-
+    glScalef(scaleFactor, scaleFactor, scaleFactor);
     glTranslatef(translateX * 0.05, translateY * 0.05, 0);
 }
 
@@ -67,6 +75,9 @@ void Scene::draw(){
     glPushName(0);
     glLoadName(67); // a distinct-looking name for debugging purposes
     drawSkeleton();
+    if(obj != NULL){
+        drawObj();
+    }
     drawGrid();
 
 }
@@ -125,10 +136,30 @@ void Scene::drawSkeleton() {
 }
 
 void Scene::rotateSkeleton(Quaternionf q) {
-    
-    //float theta = f*3.14159/180;
+        //float theta = f*3.14159/180;
     k.solveFK(k.path_[0], q);
+}
 
+void Scene::drawObj(){
+    if(obj == NULL){ return; }
+
+    glShadeModel(GL_FLAT);
+    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
+    glBegin(GL_TRIANGLES);
+    ObjFace* face;
+    Eigen::Vector3f *normal, *vertex;
+    for(unsigned int i=0; i < obj->faces.size(); i++){
+        face = obj->faces[i];
+        normal = face->normal;
+
+        for(int j=0; j<3; j++){
+            vertex = face->vertices[j];
+            glNormal3f(normal->x(), normal->y(), normal->z());
+            glVertex3f(vertex->x(), vertex->y(), vertex->z());
+        }
+    }
+    glEnd();
 }
 
 // Moves the skeleton up and down, obviously this is poorly named..
@@ -197,7 +228,7 @@ void Scene::onLeftClick(int mouseX, int mouseY) {
 void Scene::onLeftRelease(int mouseX, int mouseY) {
     double x, y, z;
     converter->convert(mouseX, mouseY, x, y, z);
-    printf("Scene::onLeftRelease called with x=%f, y=%f\n", x, y);
+    //printf("Scene::onLeftRelease called with x=%f, y=%f\n", x, y);
     mouseButtonPressed = 0;
 }
 
@@ -214,7 +245,7 @@ void Scene::onMouseMotion(int mouseX, int mouseY) {
     double eX = x - mousePreviousX;
     double eY = y - mousePreviousY;
 
-    printf("Scene::onMouseMotion called with x=%f, y=%f    dX=%f, dY=%f\n", x, y, dX, dY);
+    //printf("Scene::onMouseMotion called with x=%f, y=%f    dX=%f, dY=%f\n", x, y, dX, dY);
     if(mouseButtonPressed == GLUT_LEFT_BUTTON){
         // left button is translation
         translateX += eX;
@@ -224,6 +255,14 @@ void Scene::onMouseMotion(int mouseX, int mouseY) {
     }
     mousePreviousX = x;
     mousePreviousY = y;
+}
+
+void Scene::onZoomIn(){
+    scaleFactor += 0.05;
+}
+
+void Scene::onZoomOut(){
+    scaleFactor -= 0.05;
 }
 
 MouseToWorldConverter::MouseToWorldConverter(){

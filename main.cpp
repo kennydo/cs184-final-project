@@ -11,7 +11,7 @@
 #include <stdio.h>
 #include "joint.h"
 #include "kinematics.h"
-//#include "objparser.h"
+#include "objparser.h"
 #include "window.h"
 #include "scene.h"
 
@@ -19,16 +19,18 @@ const double PI = 4.0*atan(1.0);
 
 int main(int argc, char* argv[])
 {
-    /*
+
+    ParsedObj* obj = NULL;
     if(argc >= 2){
         printf("Attempting to parse obj file input\n");
-        ParsedObj* obj = ObjParser::parse(argv[1]);
+        obj = ObjParser::parse(argv[1]);
+        obj->centerAndScale(3.0);
         printf("Completed parsing\n");
     } else {
         printf("No .obj file passed in\n");
-    }*/
+    }
 
-    Scene* scene = new Scene();
+    Scene* scene = new Scene(obj);
     
     Vector3f origin ( 0.0, 0.0, 0.0 );
     Vector3f p1 ( 0.0, 4.0, 0.0 );
