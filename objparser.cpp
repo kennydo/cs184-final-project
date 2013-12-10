@@ -6,6 +6,40 @@ ParsedObj::ParsedObj(){
     // nothing for now
 }
 
+void ParsedObj::centerAndScale(){
+    /* centers the obj's vertices about the origin
+     * and then scales them so that the furthest vertex
+     * has a distance of 1 from the origin */
+    if(vertices.size() < 1){ return; }
+
+    Eigen::Vector3f* minVertex = vertices[0];
+    Eigen::Vector3f* maxVertex = vertices[0];
+    Eigen::Vector3f* iterVertex;
+
+    for(unsigned int i=0; i<vertices.size(); i++){
+        iterVertex = vertices[i];
+        if(iterVertex->minCoeff() < minVertex->minCoeff()){
+            minVertex = iterVertex;
+        }
+        if(iterVertex->maxCoeff() > maxVertex->maxCoeff()){
+            maxVertex = iterVertex;
+        }
+    }
+    center = (*minVertex + *maxVertex) * 0.5;
+    Eigen::Vector3f size = *maxVertex - *minVertex;
+
+    scale = size.maxCoeff();
+
+    for(unsigned int i=0; i<vertices.size(); i++){
+        iterVertex = vertices[i];
+
+        *iterVertex -= center;
+        *iterVertex /= scale;
+    }
+    printf("Center found at: %f %f %f\n", center.x(), center.y(), center.z());
+    printf("Scaling by: %f\n", scale);
+}
+
 ObjFace::ObjFace(Eigen::Vector3f* vert1, Eigen::Vector3f* vert2, Eigen::Vector3f* vert3){
     vertices[0] = vert1;
     vertices[1] = vert2;

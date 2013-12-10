@@ -1,6 +1,7 @@
 #ifndef OBJPARSER_H
 #define OBJPARSER_H
 
+#include <cmath>
 #include <Eigen/Core>
 #include <Eigen/Geometry>
 #include <iostream>
@@ -20,6 +21,11 @@ class ParsedObj {
         ParsedObj();
         std::vector<Eigen::Vector3f*> vertices;
         std::vector<ObjFace*> faces;
+
+        Eigen::Vector3f center;
+        float scale;
+
+        void centerAndScale();
 };
 
 class ObjParser {
