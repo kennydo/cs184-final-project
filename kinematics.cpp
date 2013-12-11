@@ -20,14 +20,14 @@ void printQuaternion(Quaternionf q) {
     
 }
 
-Quaternionf createQuaternion(float theta, float tx, float ty, float tz) {
+Quaternionf createQuaternion(float theta, Vector3f axis) {
     
     float n = sin(theta/2);
     
     float w = cos(theta/2);
-    float x = n*tx;
-    float y = n*ty;
-    float z = n*tz;
+    float x = n*axis.x();
+    float y = n*axis.y();
+    float z = n*axis.z();
     
     Quaternionf q(w, x, y, z);
     
@@ -85,67 +85,90 @@ bool pseudoInverse(const _Matrix_Type_ &a, _Matrix_Type_ &result, double epsilon
     return true;
 }
 
-Vector3f Kinematics::getNewPosition(vector<Quaternionf> &rotations, vector<Link> &path) {
+
+
+
+
+
+
+
+
+
+
+/*
+
+
+void Kinematics::solveFKHelper(Link &link, Quaternionf theta, Vector3f g) {
     
-     Vector3f g;
-     
-     Link root = path[0];
-     
-    if (root.getInnerLink() == -1) {
-        g = origin_;
-    } else {
-        g = path_[root.getInnerLink()].pos();
+    
+    // http://math.stackexchange.com/questions/18382/quaternion-and-rotation-about-an-origin-and-an-arbitrary-axis-origin-help
+    // to use quaternion Q to rotate point P with respect to translated origin G: P' = Q(P-G)Q' + G
+    Vector3f p_g = link.pos() - g;
+    Vector3f translated = theta._transformVector(p_g);
+    link.moveJoint(translated + g);
+    
+    vector<int> outer = link.getOuterLinks();
+    
+    if ( outer.size() > 0 ) {
+        for (unsigned int i = 0; i < outer.size(); i++) {
+            solveFKHelper(path_[outer[i]], theta, g);
+        }
     }
-    
-    Vector3f newPosition = root.pos();
-    
-    for (unsigned int i = 0; i < path.size(); i++) {
-    
-        Vector3f p_g = newPosition - g;
-        newPosition = rotation._transformVector(p_g);
-        newPosition = newPosition + g;
-        
-    }
-    
-    return newPosition;
     
 }
 
-//take step (FK) for IK segment linked to the end effector we are dealing with
-// instead of using path_ directly
-void Kinematics::takeStep(vector<Quaternionf> &rotations, vector<Link> &path) {
-     
-     Vector3f g;
-     
-     Link root = path[0];
-    Vector3f g = origin;
+void Kinematics::solveFK(Link &link, Quaternionf theta) {
     
-    for (unsigned int i = 0; i < rotations.size(); i++) {
+    Vector3f g;
+    if (link.getInnerLink() == -1) {
+        g = origin_;
+    } else {
+        g = path_[link.getInnerLink()].pos();
+    }
+    
+    solveFKHelper(link, theta, g);
+
+}
+*/
+
+
+
+Vector3f Kinematics::getNewPosition(vector<Quaternionf> &rotations, vector<Link> &path) {
+    
+    ///root gives a frame of which point we're rotating around
+    Link link;
+    Quaternionf currentQuat;
+    Vector3f g, p_g, translated;
+    
+    ///temporarily hold positions of "updated" joints
+    vector<Vector3f> updatedPositions(path.size());
+    
+    for (unsigned int i = 0; i < path.size(); i++) {
+        updatedPositions[i] = path[i].pos();
+    }
+    
+    for (unsigned int i = 0; i < rotations.size(); i++ ) {
         
-        Link base = path[i];
-            
-        if (base.getInnerLink() == -1) {
+        link = path[i];
+        currentQuat = rotations[i];
+        
+        if (link.getInnerLink() == -1) {
             g = origin_;
         } else {
-            g = path[i-1].pos();
+            g = updatedPositions[i-1];
         }
         
-        for (unsigned int j = i; j < path.size(); j++) {
-            Link current = path[j];
-            
-            Vector3f p_g = current.pos() - g;
-            Vector3f translated = theta._transformVector(p_g);
-            current.moveJoint(translated + g);
+        
+        for (unsigned int j = i; j < path.size(); j++ ) {
+        
+            p_g = updatedPositions[j] - g;
+            translated = currentQuat._transformVector(p_g);
+            updatedPositions[j] = translated + g;
         }
     }
-    /*
-    for (unsigned int i = 0; i < path.size(); i++) {
-        
-        Vector3f p_g = path[i].pos() - g;
-        Vector3f translated = rotation._transformVector(p_g);
-        path[i].moveJoint(translated + g);
-        
-    }*/
+    
+    return updatedPositions.back();
+    
 }
 
 bool Kinematics::reachedGoal(Vector3f goalPosition, Link link, float &distance) {
@@ -173,21 +196,20 @@ void Kinematics::solveIK(Link *link, Vector3f goalPosition) {
     path.insert(path.begin(), *link);
     Link current;
     while (current.getInnerLink() != -1) {
-        current = path_[path[0].getInnerLink()]; ///this can't be right...
+        current = path_[path[0].getInnerLink()];
         path.insert(path.begin(), current);
     }
     
-    //adds up all d0 so we'd only have to update kinematics only once at the end
-    VectorXf d0_final;
-    d0_final = VectorXf::Zero(path.size());
-    
-    
-    
     float currentDistance;
     float step = 1;
-    while (!reachedGoal(goalPosition, path.back(), currentDistance)) {
+    //-----------------------------------
+    reachedGoal(goalPosition, path.back(), currentDistance);
+    //-----------------------------------
+    //while (!reachedGoal(goalPosition, path.back(), currentDistance)) {
         // Compute the jacobian on this link.
-        MatrixXf jacobian = Kinematics::jacobian(path, goalPosition);
+        
+        vector<Vector3f> rotAxis; ///a list of optimal rotation axis for solved d0
+        MatrixXf jacobian = Kinematics::jacobian(path, rotAxis, goalPosition);
         MatrixXf pinv;
         // TODO: handle false ie. the case where links <= 2
         pseudoInverse(jacobian, pinv);
@@ -198,12 +220,16 @@ void Kinematics::solveIK(Link *link, Vector3f goalPosition) {
         // calcuate new point caused by d0
         VectorXf d0_step = d0*step;
         
-        vector<Quaterninof> tempRotations;
-        for (unsigned int i = 0; i < d0_step; i++) {
-            tempRotations.insert(makeQuaternion(d0_step[i], 1, 1, 1));
+        cout << "jacobian\n" << jacobian << endl;
+        cout << "d0_step\n" << d0_step << endl;
+        
+        vector<Quaternionf> rotations;
+        ///create quaternions with proper rotational axis
+        for (unsigned int i = 0; i < d0_step.size(); i++) {
+            rotations.push_back(createQuaternion(d0_step[i], rotAxis[i]));
         }
         
-        Vector3f newPosition = getNewPosition(tempRotations, path);
+        Vector3f newPosition = getNewPosition(rotations, path);
         
         //calculate distance from goal of new point
         Vector3f vnewDistance = goalPosition - newPosition;
@@ -212,42 +238,26 @@ void Kinematics::solveIK(Link *link, Vector3f goalPosition) {
         //if distance decreased, take step
         // if distance did not decrease, half the step and try again
         if (newDistance < currentDistance) {
-            takeStep(tempRotations, path);
-            d0_final += d0_step;
+            ///you have to take the step with IK because of the changing rotAxis for every jacobian
+            cout << "newPosition\n" << newPosition << endl;
+            printf("currentDistance: %f newDistance: %f\n", currentDistance, newDistance);
+            unsigned int rotationSize = rotations.size();
+            for (unsigned int i = 0; i < rotationSize - 1; i++) {
+                solveFK(path_[path[i+1].getInnerLink()], rotations[i]);
+            }
+            solveFK(*link, rotations[rotationSize-1]);
+            
+            cout << "actual solved position\n" << link->pos() << endl;
+            
         } else if (step/2 > 0) {
             step = step/2;
         } else {
-            break;
+           //break;
         }
-   }
-
-    for (unsigned int i = 0; i < d0_final; i++) {
-        rotation = makeQuaternion(d0_final[i], 1, 1, 1));
-        current = path[i+1];
-        solveFK(path_[current.getInnerLink()], d0_final[i]);
-        
-    }
-    /*
-    //solve FK for actual skeleton
-    ///need to change vector to quaternion
-    for (unsigned int i = 0; i < d0_final.size()-1; i++) {
-        current = path[i+1];
-        solveFK(path_[current.getInnerLink()], d0_final[i]);
-    }
-    solveFK(*link, d0_final[d0_final.size()-1]);*/
-    
+   //}
 }
 
-/*
-// Helper for jacobian, sums angles of terms i to j
-float Kinematics::sumAngles(vector<Link> &path, unsigned int i, unsigned int j)
-{
-    float sum = 0;
-    for(unsigned int u = i; u < j; u++) sum += path[u].getAngle(); //(*angles)[u];
-    return sum;
-}*/
-
-MatrixXf Kinematics::jacobian(vector<Link> &path, Vector3f g)
+MatrixXf Kinematics::jacobian(vector<Link> &path, vector<Vector3f> &rotAxis, Vector3f g)
 {
     
     //a'.cross(e-r')
@@ -259,10 +269,9 @@ MatrixXf Kinematics::jacobian(vector<Link> &path, Vector3f g)
     
     unsigned int n = path.size();
     MatrixXf toReturn = MatrixXf::Constant(3, n, 0);
-    
     Vector3f e, r, a;
-    e = (path.back()).pos();
     
+    e = (path.back()).pos();
     
     for (unsigned int i = 0; i < n; i++) {
         
@@ -274,41 +283,16 @@ MatrixXf Kinematics::jacobian(vector<Link> &path, Vector3f g)
         
         a = ((e-r).cross(g-r)).normalized();
         
+        rotAxis.push_back(a);
+        
         //gives us one column in the jacobian matrix
         Vector3f derivative = a.cross(e-r);
         
         toReturn(0, i) = derivative.x();
         toReturn(1, i) = derivative.y();
         toReturn(2, i) = derivative.z();
-        
-        cout << "to Return\n" << derivative << endl;
     
     }
     
     return toReturn;
-    
-    /*// Now that we have all the lengths and thetas
-    // Our matrix is of the form [dpn/dt1 dpn/dt2 ... dpn/dtn]
-    // Logic replicated from http://njoubert.com/teaching/cs184_fa08/section/sec13inversekinematicsSOL.pdf (p.4)
-    unsigned int n = path.size();
-    MatrixXf toReturn = MatrixXf::Constant(n, 3, 0);
-    for(unsigned int i = 0; i < n; i++)
-    {
-
-        // The ith column has n-i terms: 
-        for(unsigned int j = i; j < n; j++)
-        {
-            
-            //l1 cos(θ1) + l2 cos(θ1 + θ2)+ l3 cos(θ1 + θ2 + θ3) 
-            float sumThetas = sumAngles(path, 0, j+1);
-            float length = path[j].getLength();
-            
-            toReturn(i, 0) += length * cos(sumThetas);
-            toReturn(i, 1) -= length * sin(sumThetas);
-        }
-        // For now, the z coordinate is zero.
-        toReturn(i, 2) = 0.0f;
-    }
-
-    return toReturn.transpose();*/
 }
