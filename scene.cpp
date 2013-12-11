@@ -135,11 +135,6 @@ void Scene::drawSkeleton() {
     
 }
 
-void Scene::rotateSkeleton(Quaternionf q) {
-        //float theta = f*3.14159/180;
-    k.solveFK(k.path_[0], q);
-}
-
 void Scene::drawObj(){
     if(obj == NULL){ return; }
 
@@ -162,17 +157,21 @@ void Scene::drawObj(){
     glEnd();
 }
 
+void Scene::rotateSkeleton(Quaternionf q) {
+    k.solveFK(k.path_[0], q);
+}
+
 // Moves the skeleton up and down, obviously this is poorly named..
 // we'll work on that.
 void Scene::moveSkeleton(float x, float y, float z) {
     // IK can only solve for the end effector, so we want to find the last
     // element and move it.
-    /*delta.x() += x;
+    delta.x() += x;
     delta.y() += y;
     delta.z() += z;
     
     cout << "TARGET POSITION\n" << delta << endl;
-    k.solveIK(&(k.path_[endEffector]), delta);*/
+    k.solveIK(&(k.path_[endEffector]), delta);
 }
 
 void Scene::onLeftClick(int mouseX, int mouseY) {

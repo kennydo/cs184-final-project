@@ -75,8 +75,6 @@ void Window::keyboard(unsigned char key, int x, int y) {
         {
             printf("rotate joint clockwise around x axis\n");
             Quaternionf q(sqrt(0.5), sqrt(0.5), 0, 0);
-            //Quaternionf q(sqrt(0.5), 0, sqrt(0.5), 0);
-            //Quaternionf q(-sqrt(0.5), 0, 0, sqrt(0.5));
             scene->rotateSkeleton(q);
         }
             break;
@@ -84,8 +82,6 @@ void Window::keyboard(unsigned char key, int x, int y) {
         {
             printf("rotate joint counterclockwise around x axis\n");
             Quaternionf q(-sqrt(0.5), sqrt(0.5), 0, 0);
-            //Quaternionf q(sqrt(0.5), 0, sqrt(0.5), 0);
-            //Quaternionf q(sqrt(0.5), 0, 0, sqrt(0.5));
             scene->rotateSkeleton(q);
         }
             break;
