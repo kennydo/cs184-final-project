@@ -187,10 +187,8 @@ bool Kinematics::reachedGoal(Vector3f goalPosition, Link link, float &distance) 
 void Kinematics::solveIK(Link *link, Vector3f goalPosition) {
     // Assert this is an end effector.
     assert(link->getOuterLinks().size() == 0);
-
+    
     // Trace our way in, putting previous elements in the front.
-    // Make duplicate of current path because we don't want to update
-    // the actual skeleton until we've finished the system
     vector<Link> path;
     
     path.insert(path.begin(), *link);
@@ -203,11 +201,11 @@ void Kinematics::solveIK(Link *link, Vector3f goalPosition) {
     float currentDistance;
     float step = 1;
     //-----------------------------------
-    reachedGoal(goalPosition, path.back(), currentDistance);
+    //reachedGoal(goalPosition, path.back(), currentDistance);
     //-----------------------------------
-    //while (!reachedGoal(goalPosition, path.back(), currentDistance)) {
-        // Compute the jacobian on this link.
+    while (!reachedGoal(goalPosition, *link, currentDistance)) {
         
+        // Compute the jacobian on this link.
         vector<Vector3f> rotAxis; ///a list of optimal rotation axis for solved d0
         MatrixXf jacobian = Kinematics::jacobian(path, rotAxis, goalPosition);
         MatrixXf pinv;
@@ -246,15 +244,20 @@ void Kinematics::solveIK(Link *link, Vector3f goalPosition) {
                 solveFK(path_[path[i+1].getInnerLink()], rotations[i]);
             }
             solveFK(*link, rotations[rotationSize-1]);
+            for (unsigned int i = 0; i < path.size() -1; i++) {
+                path[i].moveJoint(path_[path[i+1].getInnerLink()].pos());
+            }
+            
+            (path.back()).moveJoint(link->pos());
             
             cout << "actual solved position\n" << link->pos() << endl;
             
         } else if (step/2 > 0) {
             step = step/2;
         } else {
-           //break;
+           break;
         }
-   //}
+   }
 }
 
 MatrixXf Kinematics::jacobian(vector<Link> &path, vector<Vector3f> &rotAxis, Vector3f g)
