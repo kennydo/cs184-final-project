@@ -39,8 +39,10 @@ class Scene {
         GLenum mouseButtonPressed;
         double mouseClickStartX, mouseClickStartY; // in world coordinates
         double mousePreviousX, mousePreviousY; // in world coordiantes
+        double windowPreviousX, windowPreviousY; // in screen coordinates
 
         double translateX, translateY; // in world coordinates
+        double rotateAboutX, rotateAboutY;
         float scaleFactor;
 
         void mouseToWorldCoordinates(int, int, double&, double&, double&);
@@ -71,6 +73,9 @@ class Scene {
         void onMouseMotion(int, int);
         void onLeftClick(int, int);
         void onLeftRelease(int, int);
+
+        void onRightClick(int, int);
+        void onRightRelease(int, int);
 
         void onZoomIn();
         void onZoomOut();

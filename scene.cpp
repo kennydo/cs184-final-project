@@ -9,11 +9,15 @@ Scene::Scene(ParsedObj* o, Skeleton* s, Kinematics* k){
     mouseButtonPressed = 0;
     translateX = 0;
     translateY = 0;
+    rotateAboutX = 0;
+    rotateAboutY = 0;
     scaleFactor = 1.0;
     selectedJointId = -1;
 
     mousePreviousX = 0;
     mousePreviousY = 0;
+    windowPreviousX = 0;
+    windowPreviousY = 0;
     delta = Vector3f(0, 0, 0);
 
     // just to be explicit about what obj is
@@ -43,6 +47,8 @@ void Scene::refreshCamera(int mouseX, int mouseY){
 
     // we'll probably want to use AABB and figure out scaling
     glScalef(0.05, 0.05, 0.05);
+    glRotatef(rotateAboutX, 1, 0, 0);
+    glRotatef(rotateAboutY, 0, 1, 0);
 
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
@@ -274,6 +280,21 @@ void Scene::onLeftRelease(int mouseX, int mouseY) {
     mouseButtonPressed = 0;
 }
 
+void Scene::onRightClick(int mouseX, int mouseY){
+    if(converter != NULL)
+        delete converter;
+    converter = new MouseToWorldConverter();
+
+    mouseButtonPressed = GLUT_RIGHT_BUTTON;
+
+    windowPreviousX = mouseX;
+    windowPreviousY = mouseY;
+}
+
+void Scene::onRightRelease(int mouseX, int mouseY){
+    mouseButtonPressed = 0;
+}
+
 void Scene::onMouseMotion(int mouseX, int mouseY) {
     // this function is called every time the mouse moves while a button is pressed
 
@@ -298,12 +319,23 @@ void Scene::onMouseMotion(int mouseX, int mouseY) {
             printf("Trying to move to (%f, %f, %f)\n",
                    position.x(), position.y(), position.z());
             kinematics->solveIK(&(kinematics->path_[selectedJointId]), position);
+            for(int i=0; i < int(kinematics->path_.size()); i++){
+                skeleton->joints[i]->updateLink(kinematics->path_[i]);
+            }
         }
     } else if (mouseButtonPressed == GLUT_RIGHT_BUTTON) {
         // right button is rotation
+        int windowHeight = glutGet(GLUT_WINDOW_HEIGHT);
+        int windowWidth = glutGet(GLUT_WINDOW_WIDTH);
+
+        rotateAboutY += mouseX - windowPreviousX;
+        rotateAboutX -= mouseY - windowPreviousY;
     }
     mousePreviousX = x;
     mousePreviousY = y;
+
+    windowPreviousX = mouseX;
+    windowPreviousY = mouseY;
 }
 
 void Scene::onZoomIn(){

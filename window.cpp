@@ -153,6 +153,12 @@ void Window::mouse(int button, int state, int x, int y) {
         } else if(state == GLUT_UP){
             scene->onLeftRelease(x, windowHeight - y);
         }
+    } else if (button == GLUT_RIGHT_BUTTON){
+        if(state == GLUT_DOWN){
+            scene->onRightClick(x, windowHeight - y);
+        } else if(state == GLUT_UP){
+            scene->onRightRelease(x, windowHeight - y);
+        }
     } else if (button == 3) {
         // stackoverflow ( http://stackoverflow.com/questions/14378/using-the-mouse-scrollwheel-in-glut )
         // said that 3 was scroll up
