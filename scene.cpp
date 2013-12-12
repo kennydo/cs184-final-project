@@ -24,6 +24,8 @@ Scene::Scene(ParsedObj* o, Skeleton* s, Kinematics* k){
     // When the scene is initialized the GL params aren't
     // set yet and this will cause a segfault
     converter = NULL;
+
+    displayGrid = displaySkeleton = displayObj = true;
 }
 
 void Scene::refreshCamera(int mouseX, int mouseY){
@@ -40,7 +42,6 @@ void Scene::refreshCamera(int mouseX, int mouseY){
     glScalef(0.05, 0.05, 0.05);
     glRotatef(rotateAmount.y(), -1, 0, 0);
     glRotatef(rotateAmount.x(), 0, 1, 0);
-    glRotatef(180, 0, 1, 0);
     glTranslatef(translateAmount.x(), translateAmount.y(), translateAmount.z());
 
     glMatrixMode(GL_PROJECTION);
@@ -75,13 +76,15 @@ void Scene::refreshCamera(int mouseX, int mouseY){
 
 void Scene::draw(){
     glInitNames();
-    if(skeleton != NULL){
+    if(skeleton != NULL && displaySkeleton){
         drawSkeleton();
     }
-    if(obj != NULL){
-        //drawObj();
+    if(obj != NULL && displayObj){
+        drawObj();
     }
-    drawGrid();
+    if(displayGrid){
+        drawGrid();
+    }
 
 }
 
@@ -158,6 +161,7 @@ void Scene::drawObj(){
     glShadeModel(GL_FLAT);
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
+    glColor4f(1.0, 0.0, 0.5, 0.4);
     glBegin(GL_TRIANGLES);
     ObjFace* face;
     Vector3f *normal, *vertex;

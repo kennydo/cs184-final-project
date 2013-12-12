@@ -71,6 +71,10 @@ void Window::idle(){
 
 void Window::keyboard(unsigned char key, int x, int y) {
     /*
+     * g = toggles grid
+     * k = toggles skeleton
+     * o = toggles obj
+     *
      * keyboard control scheme when something is selected:
      * w = increase Y
      * s = decrease Y
@@ -94,6 +98,15 @@ void Window::keyboard(unsigned char key, int x, int y) {
             direction.y() = (key == 'w') - (key == 's');
             direction.z() = (key == 'z') - (key == 'x');
             scene->moveJoint(direction);
+            break;
+        case 'g':
+            scene->toggleGrid();
+            break;
+        case 'k':
+            scene->toggleSkeleton();
+            break;
+        case 'o':
+            scene->toggleObj();
             break;
         case ' ':
             printf("quitting\n");

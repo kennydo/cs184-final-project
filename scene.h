@@ -61,6 +61,10 @@ class Scene {
         float hitZ;
 
         void updateSkeletonJointPositions();
+
+        bool displayGrid;
+        bool displaySkeleton;
+        bool displayObj;
     public:
         Scene(ParsedObj*, Skeleton*, Kinematics*);
 
@@ -83,6 +87,10 @@ class Scene {
 
         void onZoomIn();
         void onZoomOut();
+
+        void toggleGrid() { displayGrid = !displayGrid; };
+        void toggleSkeleton() { displaySkeleton = !displaySkeleton; };
+        void toggleObj() { displayObj = !displayObj; };
 };
 
 
