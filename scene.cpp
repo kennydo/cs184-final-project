@@ -335,7 +335,6 @@ void Scene::onMouseMotion(int mouseX, int mouseY) {
 
     double x, y, z;
     converter->convert(mouseX, mouseY, x, y, z);
-    Eigen::Vector3f position = Eigen::Vector3f(x,y, hitZ);
 
     //double dX = x - mouseClickStartX;
     //double dY = y - mouseClickStartY;
@@ -352,9 +351,9 @@ void Scene::onMouseMotion(int mouseX, int mouseY) {
             translateY += eY;
             translateZ += eZ;
         } else {
-            printf("Trying to move to (%f, %f, %f)\n",
-                   position.x(), position.y(), position.z());
-            kinematics->solveIK(&(kinematics->path_[selectedJointId]), position);
+            Vector3f currentPosition = kinematics->path_[selectedJointId].pos();
+            Vector3f newPosition = currentPosition + Vector3f(eX, eY, eZ);
+            kinematics->solveIK(&(kinematics->path_[selectedJointId]), newPosition);
             updateSkeletonJointPositions();
         }
     } else if (mouseButtonPressed == GLUT_RIGHT_BUTTON) {
