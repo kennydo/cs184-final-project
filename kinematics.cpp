@@ -187,7 +187,7 @@ bool Kinematics::reachedGoal(Vector3f goalPosition, Link link, float &distance) 
 void Kinematics::solveIK(Link *link, Vector3f goalPosition) {
     // Assert this is an end effector.
     assert(link->getOuterLinks().size() == 0);
-    
+
     // Trace our way in, putting previous elements in the front.
     vector<Link> path;
     
@@ -204,7 +204,7 @@ void Kinematics::solveIK(Link *link, Vector3f goalPosition) {
     //reachedGoal(goalPosition, path.back(), currentDistance);
     //-----------------------------------
     while (!reachedGoal(goalPosition, *link, currentDistance)) {
-        
+        //printf("=========================================================\n");
         // Compute the jacobian on this link.
         vector<Vector3f> rotAxis; ///a list of optimal rotation axis for solved d0
         MatrixXf jacobian = Kinematics::jacobian(path, rotAxis, goalPosition);
@@ -218,8 +218,12 @@ void Kinematics::solveIK(Link *link, Vector3f goalPosition) {
         // calcuate new point caused by d0
         VectorXf d0_step = d0*step;
         
-        cout << "jacobian\n" << jacobian << endl;
-        cout << "d0_step\n" << d0_step << endl;
+        if(d0_step.x() == 0 && d0_step.y() == 0 && d0_step.z() ==0) {
+            break;
+        }
+        
+        //cout << "jacobian\n" << jacobian << endl;
+        //cout << "d0_step\n" << d0_step << endl;
         
         vector<Quaternionf> rotations;
         ///create quaternions with proper rotational axis
@@ -232,13 +236,16 @@ void Kinematics::solveIK(Link *link, Vector3f goalPosition) {
         //calculate distance from goal of new point
         Vector3f vnewDistance = goalPosition - newPosition;
         float newDistance = sqrt(vnewDistance.dot(vnewDistance));
+        //cout << "new Position\n" << newPosition << endl;
+
+        printf("currentDistance: %f newDistance: %f\n", currentDistance, newDistance);
 
         //if distance decreased, take step
         // if distance did not decrease, half the step and try again
         if (newDistance < currentDistance) {
             ///you have to take the step with IK because of the changing rotAxis for every jacobian
-            cout << "newPosition\n" << newPosition << endl;
-            printf("currentDistance: %f newDistance: %f\n", currentDistance, newDistance);
+            //cout << "newPosition\n" << newPosition << endl;
+            //printf("currentDistance: %f newDistance: %f\n", currentDistance, newDistance);
             unsigned int rotationSize = rotations.size();
             for (unsigned int i = 0; i < rotationSize - 1; i++) {
                 solveFK(path_[path[i+1].getInnerLink()], rotations[i]);
@@ -250,13 +257,16 @@ void Kinematics::solveIK(Link *link, Vector3f goalPosition) {
             
             (path.back()).moveJoint(link->pos());
             
-            cout << "actual solved position\n" << link->pos() << endl;
+            //cout << "actual solved position\n" << link->pos() << endl;
             
         } else if (step/2 > 0) {
+            //printf("halve step??\n");
             step = step/2;
         } else {
+            printf("this is the end\n");
            break;
         }
+        
    }
 }
 
@@ -283,13 +293,33 @@ MatrixXf Kinematics::jacobian(vector<Link> &path, vector<Vector3f> &rotAxis, Vec
         } else {
             r = path[i-1].pos();
         }
+        //printf("========================================\n");
+        //cout << "location of pivot r\n" << r << endl;
+        //cout << "end effector pos e\n" << e << endl;
+        //cout << "goal position g\n" << g << endl;
         
         a = ((e-r).cross(g-r)).normalized();
+        /*cout << "e\n" << e << endl;
+        cout << "g\n" << g << endl;
+        cout << "r\n" << r << endl;
+        cout << "e-r\n" << e-r << endl;
+        cout << "g-r\n" << g-r << endl;*/
+        
+        if (a.x() != a.x()) a.x() = 0;
+        if (a.y() != a.x()) a.y() = 0;
+        if (a.z() != a.z()) a.z() = 0;
         
         rotAxis.push_back(a);
         
-        //gives us one column in the jacobian matrix
         Vector3f derivative = a.cross(e-r);
+        //gives us one column in the jacobian matrix
+        cout << "a\n" << a << endl;
+        
+        cout << "derivative\n" <<  derivative << endl;
+        
+        //if (derivative.x() != derivative.x()) derivative.x() = 0;
+        //if (derivative.y() != derivative.y()) derivative.y() = 0;
+        //if (derivative.z() != derivative.z()) derivative.z() = 0;
         
         toReturn(0, i) = derivative.x();
         toReturn(1, i) = derivative.y();
