@@ -26,7 +26,7 @@ int main(int argc, char* argv[])
         obj = ObjParser::parse(argv[1]);
 
         printf("Centering and scaling obj\n");
-        obj->centerAndScale(3.0);
+        obj->centerAndScale(10.0);
         printf("Centering obj by: %f, %f, %f\n",
                 obj->center.x(),
                 obj->center.y(),

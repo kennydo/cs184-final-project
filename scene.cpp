@@ -118,11 +118,11 @@ void Scene::drawGrid() {
 void Scene::drawSkeleton(){
     Link *joint, *parent;
 
-    glColor3f(0.0, 1.0, 1.0);
     for(unsigned int i=0; i < skeleton->joints.size(); i++){
         joint = skeleton->joints[i];
         parent = skeleton->parents[i];
 
+        glColor3f(0.0, 1.0, 1.0);
         glBegin(GL_LINES);
         if(parent != NULL){
             glVertex3f(parent->pos().x(), parent->pos().y(), parent->pos().z());
@@ -130,17 +130,14 @@ void Scene::drawSkeleton(){
         glVertex3f(joint->pos().x(), joint->pos().y(), joint->pos().z());
         glEnd();
 
-        //if(parent!=NULL){
-        //    printf("Parent: %f %f %f\n",
-        //            parent->pos().x(),
-        //            parent->pos().y(),
-        //            parent->pos().z());
-        //}
-        //printf("Vertex: %f %f %f\n",
-        //        joint->pos().x(),
-        //        joint->pos().y(),
-        //        joint->pos().z());
-        //printf("\n");
+        // now draw the ball joints!
+        glMatrixMode(GL_MODELVIEW);
+        glPushMatrix();
+        float scale = obj->scale;
+        glTranslatef(joint->pos().x(), joint->pos().y(), joint->pos().z());
+        glColor3f(1.0, 1.0, 0.0);
+        glutWireSphere(0.5, 10, 10);
+        glPopMatrix();
     }
 }
 
