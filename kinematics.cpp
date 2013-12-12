@@ -238,7 +238,7 @@ void Kinematics::solveIK(Link *link, Vector3f goalPosition) {
         float newDistance = sqrt(vnewDistance.dot(vnewDistance));
         //cout << "new Position\n" << newPosition << endl;
 
-        printf("currentDistance: %f newDistance: %f\n", currentDistance, newDistance);
+        //printf("currentDistance: %f newDistance: %f\n", currentDistance, newDistance);
 
         //if distance decreased, take step
         // if distance did not decrease, half the step and try again
@@ -313,9 +313,9 @@ MatrixXf Kinematics::jacobian(vector<Link> &path, vector<Vector3f> &rotAxis, Vec
         
         Vector3f derivative = a.cross(e-r);
         //gives us one column in the jacobian matrix
-        cout << "a\n" << a << endl;
+        //cout << "a\n" << a << endl;
         
-        cout << "derivative\n" <<  derivative << endl;
+        //cout << "derivative\n" <<  derivative << endl;
         
         //if (derivative.x() != derivative.x()) derivative.x() = 0;
         //if (derivative.y() != derivative.y()) derivative.y() = 0;
