@@ -66,11 +66,7 @@ class Scene {
         void drawGrid();
         void drawLink(Link);
         void drawSkeleton();
-        void drawTestSkeleton();
         void drawObj();
-
-        void rotateTestSkeleton(Quaternionf);
-        void moveTestSkeleton(float x, float y, float z);
 
         void moveJoint(Vector3f direction);
 

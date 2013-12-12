@@ -88,7 +88,6 @@ void Scene::draw(){
     if(skeleton != NULL){
         drawSkeleton();
     }
-    drawTestSkeleton();
     if(obj != NULL){
         //drawObj();
     }
@@ -163,38 +162,6 @@ void Scene::drawSkeleton(){
     }
 }
 
-void Scene::drawTestSkeleton() {
-    Vector3f p1, p2;
-    Link link;
-    
-    for (unsigned int i = 0; i < kinematics->path_.size(); i++) {
-        link = (kinematics->path_)[i];
-        
-        //if root link, then first point is origin
-        if (link.getInnerLink() == -1)  {
-            p1 = kinematics->origin_;
-        } else { // otherwise first point is inner link's position
-            p1 = (kinematics->path_[(link.getInnerLink())]).pos();
-        }
-        
-        //second point is just current link's position
-        p2 = link.pos();
-    
-        //draw the link
-        glColor3f(1.0, 1.0, 1.0);
-        glBegin(GL_LINES);
-        glVertex3f(p1.x(), p1.y(), p1.z());
-        glVertex3f(p2.x(), p2.y(), p2.z());
-        glEnd();
-    
-    }
-    
-}
-
-void Scene::rotateTestSkeleton(Quaternionf q) {
-    kinematics->solveFK(kinematics->path_[0], q);
-}
-
 void Scene::drawObj(){
     if(obj == NULL){ return; }
 
@@ -215,19 +182,6 @@ void Scene::drawObj(){
         }
     }
     glEnd();
-}
-
-// Moves the skeleton up and down, obviously this is poorly named..
-// we'll work on that.
-void Scene::moveTestSkeleton(float x, float y, float z) {
-    // IK can only solve for the end effector, so we want to find the last
-    // element and move it.
-    delta.x() += x;
-    delta.y() += y;
-    delta.z() += z;
-    
-    cout << "TARGET POSITION\n" << delta << endl;
-    kinematics->solveIK(&(kinematics->path_[2]), delta);
 }
 
 void Scene::moveJoint(Vector3f direction){
