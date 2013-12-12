@@ -59,9 +59,23 @@ void Scene::refreshCamera(int mouseX, int mouseY){
                       viewport);
     }
 
+    int windowHeight = glutGet(GLUT_WINDOW_HEIGHT);
+    int windowWidth = glutGet(GLUT_WINDOW_WIDTH);
+
+    float aspectRatio = float(windowWidth) / float(windowHeight);
+    float xAmount, yAmount;
+    if(aspectRatio < 1){
+        // it's tall and skinny
+        xAmount = 0.6;
+        yAmount = xAmount / aspectRatio;
+    } else {
+        yAmount = 0.6;
+        xAmount = yAmount * aspectRatio;
+    }
+
     // we'll probably want to not be using ortho projection
-    glOrtho(-0.6, 0.6,
-            -0.6, 0.6,
+    glOrtho(-1 * xAmount, xAmount,
+            -1 * yAmount, yAmount,
             -1.0, 1.0);
     glScalef(scaleFactor, scaleFactor, scaleFactor);
     glTranslatef(translateX * 0.05, translateY * 0.05, 0);
