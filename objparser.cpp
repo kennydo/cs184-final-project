@@ -11,7 +11,7 @@ void ParsedObj::centerAndScale(float s){
      * and then scales them so that the furthest vertex
      * has a distance of 's' from the origin */
     if(vertices.size() < 1){
-        printf("Invalid number of vertices: %f\n", vertices.size());
+        printf("Invalid number of vertices: %i\n", int(vertices.size()));
         return;
     }
 

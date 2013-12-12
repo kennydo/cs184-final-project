@@ -51,6 +51,8 @@ class Scene {
         Vector3f delta;
         ParsedObj* obj;
         Skeleton* skeleton;
+
+        int selectedJointId;
     public:
         Scene(ParsedObj*, Skeleton*);
         

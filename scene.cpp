@@ -10,6 +10,7 @@ Scene::Scene(ParsedObj* o, Skeleton* s){
     translateX = 0;
     translateY = 0;
     scaleFactor = 1.0;
+    selectedJointId = -1;
 
     mousePreviousX = 0;
     mousePreviousY = 0;
@@ -77,8 +78,6 @@ void Scene::refreshCamera(int mouseX, int mouseY){
 
 void Scene::draw(){
     glInitNames();
-    glPushName(0);
-    glLoadName(67); // a distinct-looking name for debugging purposes
     if(skeleton != NULL){
         drawSkeleton();
     }
@@ -118,26 +117,42 @@ void Scene::drawGrid() {
 void Scene::drawSkeleton(){
     Link *joint, *parent;
 
-    for(unsigned int i=0; i < skeleton->joints.size(); i++){
+    for(int i=0; i < int(skeleton->joints.size()); i++){
         joint = skeleton->joints[i];
         parent = skeleton->parents[i];
 
-        glColor3f(0.0, 1.0, 1.0);
-        glBegin(GL_LINES);
         if(parent != NULL){
+            glColor3f(0.0, 1.0, 1.0);
+            glBegin(GL_LINES);
             glVertex3f(parent->pos().x(), parent->pos().y(), parent->pos().z());
+            glVertex3f(joint->pos().x(), joint->pos().y(), joint->pos().z());
+            glEnd();
         }
-        glVertex3f(joint->pos().x(), joint->pos().y(), joint->pos().z());
-        glEnd();
 
         // now draw the ball joints!
+        glPushName(0);
+        glLoadName(i);
+
         glMatrixMode(GL_MODELVIEW);
         glPushMatrix();
-        float scale = obj->scale;
         glTranslatef(joint->pos().x(), joint->pos().y(), joint->pos().z());
-        glColor3f(1.0, 1.0, 0.0);
+        if(i == selectedJointId){
+            glColor3f(1.0, 1.0, 0.0);
+        } else {
+            glColor3f(0.0, 0.0, 1.0);
+        }
         glutWireSphere(0.5, 10, 10);
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA,GL_ONE);
+        if(i == selectedJointId){
+            glColor4f(1.0, 1.0, 0.0, 0.1);
+        } else {
+            glColor4f(0.0, 0.0, 1.0, 0.1);
+        }
+        glutSolidSphere(0.5, 10, 10);
         glPopMatrix();
+
+        glPopName();
     }
 }
 
@@ -238,6 +253,7 @@ void Scene::onLeftClick(int mouseX, int mouseY) {
     numHits = glRenderMode(renderMode);
     // if numHits == -1, there was a overflow in the selection buffer
     if (numHits == 0){
+        selectedJointId = -1;
         return;
     }
 
@@ -254,6 +270,7 @@ void Scene::onLeftClick(int mouseX, int mouseY) {
     for(unsigned int j=0; j<numItems; j++){
         item = pickBuffer[3 + j];
         printf("item: %d\n", item);
+        selectedJointId = item;
     }
     printf("\n");
 }
@@ -272,8 +289,8 @@ void Scene::onMouseMotion(int mouseX, int mouseY) {
     double x, y, z;
     converter->convert(mouseX, mouseY, x, y, z);
 
-    double dX = x - mouseClickStartX;
-    double dY = y - mouseClickStartY;
+    //double dX = x - mouseClickStartX;
+    //double dY = y - mouseClickStartY;
 
     double eX = x - mousePreviousX;
     double eY = y - mousePreviousY;
