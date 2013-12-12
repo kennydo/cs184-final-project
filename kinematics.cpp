@@ -76,12 +76,13 @@ void Kinematics::solveFK(Link &link, Quaternionf theta) {
 template<typename _Matrix_Type_>
 bool pseudoInverse(const _Matrix_Type_ &a, _Matrix_Type_ &result, double epsilon = std::numeric_limits<double>::epsilon())
 {
-    if(a.rows() < a.cols())
-        return false;
+    //if(a.rows() < a.cols())
+    //    return false;
     Eigen::JacobiSVD< _Matrix_Type_ > svd = a.jacobiSvd(Eigen::ComputeThinU | Eigen::ComputeThinV);
     double tolerance = epsilon * std::max(a.cols(), a.rows()) * svd.singularValues().array().abs().maxCoeff();
     result = svd.matrixV() * _Matrix_Type_( (svd.singularValues().array().abs() > tolerance).select(svd.singularValues().array().inverse(), 0) ).asDiagonal() *
     svd.matrixU().adjoint();
+
     return true;
 }
 
@@ -326,6 +327,5 @@ MatrixXf Kinematics::jacobian(vector<Link> &path, vector<Vector3f> &rotAxis, Vec
         toReturn(2, i) = derivative.z();
     
     }
-    
     return toReturn;
 }

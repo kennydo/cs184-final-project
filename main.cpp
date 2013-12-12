@@ -43,13 +43,13 @@ int main(int argc, char* argv[])
         skeleton = Skeleton::parse(argv[2]);
         printf("Completed parsing\n");
 
-        //Eigen::Vector3f offset = -1 * obj->center;
-        //printf("Centering by (%f, %f, %f)\n", offset.x(), offset.y(), offset.z());
-        //skeleton->offset(-1 * obj->center);
+        Eigen::Vector3f offset = -1 * obj->center;
+        printf("Centering by (%f, %f, %f)\n", offset.x(), offset.y(), offset.z());
+        skeleton->offset(-1 * obj->center);
 
-        //float scale = obj->scale;
-        //printf("Scaling by %f\n", scale);
-        //skeleton->scale(obj->scale);
+        float scale = obj->scale;
+        printf("Scaling by %f\n", scale);
+        skeleton->scale(obj->scale);
     } else {
         printf("No skeleton file passed in\n");
     }
@@ -96,7 +96,7 @@ int main(int argc, char* argv[])
         }
     }
 
-    Kinematics*  kinematics = new Kinematics(origin, path);
+    Kinematics*  kinematics = new Kinematics(path[0].pos(), path);
 
     Scene* scene = new Scene(obj, skeleton, kinematics);
 
