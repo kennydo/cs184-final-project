@@ -62,6 +62,7 @@ class Scene {
 
         void drawGrid();
         void drawLink(Link);
+        void drawSkeleton();
         void drawTestSkeleton();
         void drawObj();
 

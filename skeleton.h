@@ -16,6 +16,7 @@ class Skeleton {
         static Skeleton* parse(std::string);
 
         std::vector<Link*> joints;
+        std::vector<Link*> parents;
 };
 
 #endif

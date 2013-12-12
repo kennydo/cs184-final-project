@@ -48,6 +48,9 @@ Skeleton* Skeleton::parse(std::string filename){
                 // add the inner and outer links
                 skeleton->joints[parent]->addOuterLink(id);
                 joint->addInnerLink(parent);
+                skeleton->parents.push_back(skeleton->joints[parent]);
+            } else {
+                skeleton->parents.push_back(NULL);
             }
         }
     } else {

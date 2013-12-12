@@ -79,9 +79,12 @@ void Scene::draw(){
     glInitNames();
     glPushName(0);
     glLoadName(67); // a distinct-looking name for debugging purposes
+    if(skeleton != NULL){
+        drawSkeleton();
+    }
     drawTestSkeleton();
     if(obj != NULL){
-        drawObj();
+        //drawObj();
     }
     drawGrid();
 
@@ -110,6 +113,35 @@ void Scene::drawGrid() {
     glEnd();
     
     glPopAttrib();
+}
+
+void Scene::drawSkeleton(){
+    Link *joint, *parent;
+
+    glColor3f(0.0, 1.0, 1.0);
+    for(unsigned int i=0; i < skeleton->joints.size(); i++){
+        joint = skeleton->joints[i];
+        parent = skeleton->parents[i];
+
+        glBegin(GL_LINES);
+        if(parent != NULL){
+            glVertex3f(parent->pos().x(), parent->pos().y(), parent->pos().z());
+        }
+        glVertex3f(joint->pos().x(), joint->pos().y(), joint->pos().z());
+        glEnd();
+
+        //if(parent!=NULL){
+        //    printf("Parent: %f %f %f\n",
+        //            parent->pos().x(),
+        //            parent->pos().y(),
+        //            parent->pos().z());
+        //}
+        //printf("Vertex: %f %f %f\n",
+        //        joint->pos().x(),
+        //        joint->pos().y(),
+        //        joint->pos().z());
+        //printf("\n");
+    }
 }
 
 void Scene::drawTestSkeleton() {
