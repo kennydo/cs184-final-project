@@ -42,7 +42,6 @@ Quaternionf createQuaternion(float theta, Vector3f axis) {
 
 void Kinematics::solveFKHelper(Link &link, Quaternionf theta, Vector3f g) {
     
-    
     // http://math.stackexchange.com/questions/18382/quaternion-and-rotation-about-an-origin-and-an-arbitrary-axis-origin-help
     // to use quaternion Q to rotate point P with respect to translated origin G: P' = Q(P-G)Q' + G
     Vector3f p_g = link.pos() - g;
@@ -88,52 +87,6 @@ bool pseudoInverse(const _Matrix_Type_ &a, _Matrix_Type_ &result, double epsilon
 
 
 
-
-
-
-
-
-
-
-
-/*
-
-
-void Kinematics::solveFKHelper(Link &link, Quaternionf theta, Vector3f g) {
-    
-    
-    // http://math.stackexchange.com/questions/18382/quaternion-and-rotation-about-an-origin-and-an-arbitrary-axis-origin-help
-    // to use quaternion Q to rotate point P with respect to translated origin G: P' = Q(P-G)Q' + G
-    Vector3f p_g = link.pos() - g;
-    Vector3f translated = theta._transformVector(p_g);
-    link.moveJoint(translated + g);
-    
-    vector<int> outer = link.getOuterLinks();
-    
-    if ( outer.size() > 0 ) {
-        for (unsigned int i = 0; i < outer.size(); i++) {
-            solveFKHelper(path_[outer[i]], theta, g);
-        }
-    }
-    
-}
-
-void Kinematics::solveFK(Link &link, Quaternionf theta) {
-    
-    Vector3f g;
-    if (link.getInnerLink() == -1) {
-        g = origin_;
-    } else {
-        g = path_[link.getInnerLink()].pos();
-    }
-    
-    solveFKHelper(link, theta, g);
-
-}
-*/
-
-
-
 Vector3f Kinematics::getNewPosition(vector<Quaternionf> &rotations, vector<Link> &path) {
     
     ///root gives a frame of which point we're rotating around
@@ -148,6 +101,7 @@ Vector3f Kinematics::getNewPosition(vector<Quaternionf> &rotations, vector<Link>
         updatedPositions[i] = path[i].pos();
     }
     
+    
     for (unsigned int i = 0; i < rotations.size(); i++ ) {
         
         link = path[i];
@@ -155,6 +109,8 @@ Vector3f Kinematics::getNewPosition(vector<Quaternionf> &rotations, vector<Link>
         
         if (link.getInnerLink() == -1) {
             g = origin_;
+        } else if (i == 0) {
+            g = path_[path[0].getInnerLink()].pos();
         } else {
             g = updatedPositions[i-1];
         }
@@ -178,7 +134,6 @@ bool Kinematics::reachedGoal(Vector3f goalPosition, Link link, float &distance) 
     distance = sqrt(vDistance.dot(vDistance));
     //printf("distance: %f\n", distance);
     if (fabs(distance) < EPSILON) {
-        printf("GOAL REACHED\n");
         return true;
     }
     return false;
@@ -192,20 +147,21 @@ void Kinematics::solveIK(Link *link, Vector3f goalPosition) {
     // Trace our way in, putting previous elements in the front.
     vector<Link> path;
     
-    path.insert(path.begin(), *link);
-    Link current;
+    //insert everything except the root
+    //path.insert(path.begin(), *link);
+    Link current = *link;
     while (current.getInnerLink() != -1) {
-        current = path_[path[0].getInnerLink()];
         path.insert(path.begin(), current);
+        current = path_[path[0].getInnerLink()];
     }
+    
+    printf("LENGTH OF PATH: %d\n", path.size());
     
     float currentDistance;
     float step = 1;
-    //-----------------------------------
-    //reachedGoal(goalPosition, path.back(), currentDistance);
-    //-----------------------------------
+
     while (!reachedGoal(goalPosition, *link, currentDistance)) {
-        //printf("=========================================================\n");
+
         // Compute the jacobian on this link.
         vector<Vector3f> rotAxis; ///a list of optimal rotation axis for solved d0
         MatrixXf jacobian = Kinematics::jacobian(path, rotAxis, goalPosition);
@@ -222,9 +178,6 @@ void Kinematics::solveIK(Link *link, Vector3f goalPosition) {
         if(d0_step.x() == 0 && d0_step.y() == 0 && d0_step.z() ==0) {
             break;
         }
-        
-        //cout << "jacobian\n" << jacobian << endl;
-        //cout << "d0_step\n" << d0_step << endl;
         
         vector<Quaternionf> rotations;
         ///create quaternions with proper rotational axis
@@ -245,8 +198,6 @@ void Kinematics::solveIK(Link *link, Vector3f goalPosition) {
         // if distance did not decrease, half the step and try again
         if (newDistance < currentDistance) {
             ///you have to take the step with IK because of the changing rotAxis for every jacobian
-            //cout << "newPosition\n" << newPosition << endl;
-            //printf("currentDistance: %f newDistance: %f\n", currentDistance, newDistance);
             unsigned int rotationSize = rotations.size();
             for (unsigned int i = 0; i < rotationSize - 1; i++) {
                 solveFK(path_[path[i+1].getInnerLink()], rotations[i]);
@@ -258,10 +209,7 @@ void Kinematics::solveIK(Link *link, Vector3f goalPosition) {
             
             (path.back()).moveJoint(link->pos());
             
-            //cout << "actual solved position\n" << link->pos() << endl;
-            
         } else if (step/2 > 0) {
-            //printf("halve step??\n");
             step = step/2;
         } else {
             printf("this is the end\n");
@@ -292,7 +240,7 @@ MatrixXf Kinematics::jacobian(vector<Link> &path, vector<Vector3f> &rotAxis, Vec
         if (path[i].getInnerLink() == -1) {
             r = origin_;
         } else {
-            r = path[i-1].pos();
+            r = path_[path[i].getInnerLink()].pos();
         }
         //printf("========================================\n");
         //cout << "location of pivot r\n" << r << endl;

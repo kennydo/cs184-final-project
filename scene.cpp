@@ -205,7 +205,7 @@ void Scene::moveTestSkeleton(float x, float y, float z) {
     delta.z() += z;
     
     cout << "TARGET POSITION\n" << delta << endl;
-    //k.solveIK(&(k.path_[endEffector]), delta);
+    kinematics->solveIK(&(kinematics->path_[2]), delta);
 }
 
 void Scene::onLeftClick(int mouseX, int mouseY) {

@@ -53,37 +53,62 @@ int main(int argc, char* argv[])
     } else {
         printf("No skeleton file passed in\n");
     }
-
-    Vector3f origin ( 0.0, 0.0, 0.0 );
-    Vector3f p1 ( 0.0, 4.0, 0.0 );
-    Vector3f p2 ( 4.0, 4.0, 0.0 );
-    Vector3f p3 ( 4.0, 2.0, 0.0 );
+    /*
+    Vector3f origin ( -1.0, 0.0, 0.0 );
+    
+    Vector3f p1 ( 0.0, 4.0, 0.0 ); // 0
+    Vector3f p2 ( 4.0, 4.0, 0.0 ); // 1
+    Vector3f p3 ( 4.0, 2.0, 0.0 ); // 2
+    
+    Vector3f p4 ( 0.0, -4.0, 0.0 ); // 3
+    Vector3f p5 ( 4.0, -4.0, 0.0 ); // 4
+    Vector3f p6 ( 4.0, -2.0, 0.0 ); // 5
 
     Quaternionf q1(1, 0, 0, 0);
-    //Quaternionf q2(1, 0, 0, 0);
-    //Quaternionf q2(sqrt(0.5), sqrt(0.5), 0, 0);
-    //Quaternionf q2(sqrt(0.5), 0, sqrt(0.5), 0);
+
     Quaternionf q2(sqrt(0.5), 0, 0, sqrt(0.5));
-    
-    //Quaternionf q3(1, 0, 0, 0);
-    //Quaternionf q3(sqrt(0.5), sqrt(0.5), 0, 0);
-    //Quaternionf q3(sqrt(0.5), 0, sqrt(0.5), 0);
+
     Quaternionf q3(sqrt(0.5), 0, 0, sqrt(0.5));
     
+    Link l0 = Link(0, origin, q1);
     Link l1 = Link(4, p1, q1);
     Link l2 = Link(4, p2, q2);
     Link l3 = Link(2, p3, q3);
     
-    l1.addOuterLink(1);
-    l2.addInnerLink(0);
-    l2.addOuterLink(2);
-    l3.addInnerLink(1);
+    
+    Link l4 = Link(4, p4, q1);
+    Link l5 = Link(4, p5, q1);
+    Link l6 = Link(2, p6, q1);
+    
+    l0.addOuterLink(1);
+    l1.addInnerLink(0);
+    l1.addOuterLink(2);
+    l2.addInnerLink(1);
+    l2.addOuterLink(3);
+    l3.addInnerLink(2);
+    
+    l4.addOuterLink(5);
+    l5.addInnerLink(4);
+    l5.addOuterLink(6);
+    l6.addInnerLink(5);
+    
+    
+    vector<Link> path;
+    path.push_back(l0);
+    path.push_back(l1);
+    path.push_back(l2);
+    path.push_back(l3);
+    path.push_back(l4);
+    path.push_back(l5);
+    path.push_back(l6);*/
+    
+    
     
     vector<Link> path;
     for(int i=0; i < int(skeleton->joints.size()); i++){
         path.push_back(* (skeleton->joints[i]));
     }
-
+    /*
     printf("Printing path\n");
     for(int i=0; i < int(path.size()); i++){
         Vector3f position = path[i].pos();
@@ -94,7 +119,9 @@ int main(int argc, char* argv[])
         for(int j=0; j < int(outerLinks.size()); j++){
             printf("\t%d\n", outerLinks[j]);
         }
-    }
+    }*/
+
+    //Kinematics* kinematics = new Kinematics(origin, path);
 
     Kinematics*  kinematics = new Kinematics(path[0].pos(), path);
 
