@@ -154,9 +154,9 @@ void Kinematics::solveIK(Link *link, Vector3f goalPosition) {
         path.insert(path.begin(), current);
         current = path_[path[0].getInnerLink()];
     }
-    
-    printf("LENGTH OF PATH: %d\n", path.size());
-    
+
+    std::cout << "Length of path: " << path.size() << std::endl;
+
     float currentDistance;
     float step = 1;
 
