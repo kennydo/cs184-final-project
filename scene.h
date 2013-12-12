@@ -46,16 +46,14 @@ class Scene {
         void mouseToWorldCoordinates(int, int, double&, double&, double&);
         MouseToWorldConverter *converter;
         
-        Kinematics k;
+        Kinematics* kinematics;
         Vector3f delta;
         ParsedObj* obj;
         Skeleton* skeleton;
 
         int selectedJointId;
     public:
-        Scene(ParsedObj*, Skeleton*);
-        
-        void addKinematics(Kinematics);
+        Scene(ParsedObj*, Skeleton*, Kinematics*);
 
         void refreshCamera(int, int);
         void draw();

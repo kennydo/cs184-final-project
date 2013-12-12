@@ -3,7 +3,7 @@
 #include <iostream>
 #include <cmath>
 
-Scene::Scene(ParsedObj* o, Skeleton* s){
+Scene::Scene(ParsedObj* o, Skeleton* s, Kinematics* k){
     // initialize variables
     renderMode = GL_RENDER;
     mouseButtonPressed = 0;
@@ -17,24 +17,13 @@ Scene::Scene(ParsedObj* o, Skeleton* s){
     delta = Vector3f(0, 0, 0);
 
     // just to be explicit about what obj is
-    if(o == NULL){
-        obj = NULL;
-    } else {
-        obj = o;
-    }
-    if(s == NULL){
-        skeleton = NULL;
-    } else {
-        skeleton = s;
-    }
+    obj = o;
+    skeleton = s;
+    kinematics = k;
 
     // When the scene is initialized the GL params aren't
     // set yet and this will cause a segfault
     converter = NULL;
-}
-
-void Scene::addKinematics(Kinematics kinematics) {
-    k = kinematics;
 }
 
 void Scene::refreshCamera(int mouseX, int mouseY){
@@ -156,14 +145,14 @@ void Scene::drawTestSkeleton() {
     Vector3f p1, p2;
     Link link;
     
-    for (unsigned int i = 0; i < k.path_.size(); i++) {
-        link = (k.path_)[i];
+    for (unsigned int i = 0; i < kinematics->path_.size(); i++) {
+        link = (kinematics->path_)[i];
         
         //if root link, then first point is origin
         if (link.getInnerLink() == -1)  {
-            p1 = k.origin_;
+            p1 = kinematics->origin_;
         } else { // otherwise first point is inner link's position
-            p1 = (k.path_[(link.getInnerLink())]).pos();
+            p1 = (kinematics->path_[(link.getInnerLink())]).pos();
         }
         
         //second point is just current link's position
@@ -181,7 +170,7 @@ void Scene::drawTestSkeleton() {
 }
 
 void Scene::rotateTestSkeleton(Quaternionf q) {
-    k.solveFK(k.path_[0], q);
+    kinematics->solveFK(kinematics->path_[0], q);
 }
 
 void Scene::drawObj(){
@@ -288,6 +277,7 @@ void Scene::onMouseMotion(int mouseX, int mouseY) {
 
     double x, y, z;
     converter->convert(mouseX, mouseY, x, y, z);
+    Eigen::Vector3f position = Eigen::Vector3f(x,y,z);
 
     //double dX = x - mouseClickStartX;
     //double dY = y - mouseClickStartY;
@@ -296,10 +286,16 @@ void Scene::onMouseMotion(int mouseX, int mouseY) {
     double eY = y - mousePreviousY;
 
     //printf("Scene::onMouseMotion called with x=%f, y=%f    dX=%f, dY=%f\n", x, y, dX, dY);
-    if(selectedJointId < 0 && mouseButtonPressed == GLUT_LEFT_BUTTON){
-        // left button is translation
-        translateX += eX;
-        translateY += eY;
+    if(mouseButtonPressed == GLUT_LEFT_BUTTON){
+        if(selectedJointId < 0){
+            // translation
+            translateX += eX;
+            translateY += eY;
+        } else {
+            printf("Trying to move to (%f, %f, %f)\n",
+                   position.x(), position.y(), position.z());
+            kinematics->solveIK(&(kinematics->path_[selectedJointId]), position);
+        }
     } else if (mouseButtonPressed == GLUT_RIGHT_BUTTON) {
         // right button is rotation
     }

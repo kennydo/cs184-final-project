@@ -54,8 +54,6 @@ int main(int argc, char* argv[])
         printf("No skeleton file passed in\n");
     }
 
-    Scene* scene = new Scene(obj, skeleton);
-    
     Vector3f origin ( 0.0, 0.0, 0.0 );
     Vector3f p1 ( 0.0, 4.0, 0.0 );
     Vector3f p2 ( 4.0, 4.0, 0.0 );
@@ -86,8 +84,9 @@ int main(int argc, char* argv[])
         path.push_back(* (skeleton->joints[i]));
     }
 
-    Kinematics k = Kinematics(origin, path);
-    scene->addKinematics(k);
+    Kinematics*  kinematics = new Kinematics(origin, path);
+
+    Scene* scene = new Scene(obj, skeleton, kinematics);
 
     glutInit(&argc, argv);
 
