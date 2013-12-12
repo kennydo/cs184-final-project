@@ -13,12 +13,12 @@ using namespace Eigen;
 class Link
 {
 private:
-    float length_, theta_;
-    Vector3f pos_;
-    int l0_;
     vector<int> l1_;
+    float length_;
+    Vector3f pos_;
     Quaternionf angle_;
-    
+    int l0_;
+
 public:
     Link() {}
     Link(float length, Vector3f pos, Quaternionf angle) : length_(length), pos_(pos), angle_(angle), l0_(-1) {}
