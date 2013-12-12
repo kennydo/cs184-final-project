@@ -31,8 +31,6 @@ void Window::init(int w, int h, std::string t, int pos_x, int pos_y, Scene* s){
     // re-normalize things automatically because scaling messes with normals
     glEnable(GL_NORMALIZE);
 
-    // by default, we are in wireframe mode, so no need for lighting
-
     glutDisplayFunc(Window::display);
     glutReshapeFunc(Window::reshape);
     glutKeyboardFunc(Window::keyboard);

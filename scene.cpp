@@ -33,10 +33,9 @@ void Scene::refreshCamera(int mouseX, int mouseY){
     // when the renderMode isn't GL_SELECT, those values aren't used for anything
     // so just pass in dummy 0,0
     int viewport[4];
+
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-    GLfloat light_pos[4] = {0.0, 0.0, -1.0, 0.0};
-    glLightfv(GL_LIGHT0, GL_POSITION, light_pos);
 
     // we'll probably want to use AABB and figure out scaling
     glScalef(0.05, 0.05, 0.05);
@@ -158,12 +157,26 @@ void Scene::drawSkeleton(){
 
 void Scene::drawObj(){
     if(obj == NULL){ return; }
+    //GLfloat lightAmbient[] = {1.0f, 1.0f, 1.0f, 0.5f};
 
-    glShadeModel(GL_FLAT);
-    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+    //glEnable(GL_LIGHTING);
+    //glEnable(GL_LIGHT0);
+    //glEnable(GL_LIGHT1);
 
-    glColor4f(1.0, 0.0, 0.5, 0.4);
+    //GLfloat light_pos[4] = {100.0, 0.0, 100.0, 0.0};
+    //glLightfv(GL_LIGHT0, GL_POSITION, light_pos);
+    //glLightfv(GL_LIGHT0, GL_AMBIENT, lightAmbient);
+
+    //GLfloat light_pos2[4] = {0.0, 100.0, 100.0, 0.0};
+    //glLightfv(GL_LIGHT1, GL_POSITION, light_pos2);
+    //glLightfv(GL_LIGHT1, GL_AMBIENT, lightAmbient);
+
+    //glColor3f(0,0,0);
+    //glPolygonMode(GL_FRONT, GL_FILL);
+    //glShadeModel(GL_SMOOTH);
+    glColor4f(0.5, 1.0, 0.0, 0.1);
     glBegin(GL_TRIANGLES);
+
     ObjFace* face;
     Vector3f *normal, *vertex;
     for(unsigned int i=0; i < obj->faces.size(); i++){
@@ -177,6 +190,9 @@ void Scene::drawObj(){
         }
     }
     glEnd();
+    //glDisable(GL_LIGHT1);
+    //glDisable(GL_LIGHT0);
+    //glDisable(GL_LIGHTING);
 }
 
 void Scene::moveJoint(Vector3f direction){

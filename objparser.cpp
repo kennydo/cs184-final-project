@@ -67,7 +67,8 @@ ObjFace::ObjFace(Eigen::Vector3f* vert1, Eigen::Vector3f* vert2, Eigen::Vector3f
     Eigen::Vector3f edge1 = *vert1 - *vert2;
     Eigen::Vector3f edge2 = *vert2 - *vert3;
     normal = new Eigen::Vector3f(edge2.cross(edge1));
-    normal->normalize();
+    // rely on GL_NORMALIZE to normalize everything for us
+ //   normal->normalize();
 }
 
 ParsedObj* ObjParser::parse(std::string filename){
