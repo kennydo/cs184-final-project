@@ -7,20 +7,14 @@ Scene::Scene(ParsedObj* o, Skeleton* s, Kinematics* k){
     // initialize variables
     renderMode = GL_RENDER;
     mouseButtonPressed = 0;
-    translateX = 0;
-    translateY = 0;
-    translateZ = 0;
-    rotateAboutX = 0;
-    rotateAboutY = 0;
+
+    translateAmount = Vector3f(0, 0, 0);
+    rotateAmount = Vector3f(0, 0, 0);
     scaleFactor = 1.0;
     selectedJointId = -1;
 
-    mousePreviousX = 0;
-    mousePreviousY = 0;
-    mousePreviousZ = 0;
-    windowPreviousX = 0;
-    windowPreviousY = 0;
-    delta = Vector3f(0, 0, 0);
+    mousePrevious = Vector3f(0, 0, 0);
+    windowPrevious = Vector3f(0, 0, 0);
 
     // just to be explicit about what obj is
     obj = o;
@@ -42,16 +36,11 @@ void Scene::refreshCamera(int mouseX, int mouseY){
     GLfloat light_pos[4] = {0.0, 0.0, -1.0, 0.0};
     glLightfv(GL_LIGHT0, GL_POSITION, light_pos);
 
-
-   //glRotatef(30, 1, 0, 0);
-   //glRotatef(30, 0, 1, 0);
-
-
     // we'll probably want to use AABB and figure out scaling
     glScalef(0.05, 0.05, 0.05);
-    glRotatef(rotateAboutX, 1, 0, 0);
-    glRotatef(rotateAboutY, 0, 1, 0);
-    glTranslatef(translateX, translateY , translateZ);
+    glRotatef(rotateAmount.y(), -1, 0, 0);
+    glRotatef(rotateAmount.x(), 0, 1, 0);
+    glTranslatef(translateAmount.x(), translateAmount.y(), translateAmount.z());
 
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
@@ -170,7 +159,7 @@ void Scene::drawObj(){
 
     glBegin(GL_TRIANGLES);
     ObjFace* face;
-    Eigen::Vector3f *normal, *vertex;
+    Vector3f *normal, *vertex;
     for(unsigned int i=0; i < obj->faces.size(); i++){
         face = obj->faces[i];
         normal = face->normal;
@@ -212,12 +201,8 @@ void Scene::onLeftClick(int mouseX, int mouseY) {
 
     double x, y, z;
     converter->convert(mouseX, mouseY, x, y, z);
-    mouseClickStartX = x;
-    mouseClickStartY = y;
-    mouseClickStartZ = z;
-    mousePreviousX = mouseClickStartX;
-    mousePreviousY = mouseClickStartY;
-    mousePreviousZ = mouseClickStartZ;
+    mouseClickStart = Vector3f(x, y, z);
+    mousePrevious = mouseClickStart;
     printf("Scene::onLeftClick called with x=%f, y=%f, z=%f\n", x, y, z);
     mouseButtonPressed = GLUT_LEFT_BUTTON;
     GLint numHits;
@@ -275,8 +260,7 @@ void Scene::onRightClick(int mouseX, int mouseY){
 
     mouseButtonPressed = GLUT_RIGHT_BUTTON;
 
-    windowPreviousX = mouseX;
-    windowPreviousY = mouseY;
+    windowPrevious = Vector3f(mouseX, mouseY, 0);
 }
 
 void Scene::onRightRelease(int mouseX, int mouseY){
@@ -285,45 +269,31 @@ void Scene::onRightRelease(int mouseX, int mouseY){
 
 void Scene::onMouseMotion(int mouseX, int mouseY) {
     // this function is called every time the mouse moves while a button is pressed
-
-
     double x, y, z;
     converter->convert(mouseX, mouseY, x, y, z);
 
-    //double dX = x - mouseClickStartX;
-    //double dY = y - mouseClickStartY;
-
-    double eX = x - mousePreviousX;
-    double eY = y - mousePreviousY;
-    double eZ = z - mousePreviousZ;
+    Vector3f mouseCurrent = Vector3f(x, y, z);
+    Vector3f windowCurrent = Vector3f(mouseX, mouseY, 0);
+    Vector3f mouseDelta = Vector3f(x, y, z) - mousePrevious;
 
     //printf("Scene::onMouseMotion called with x=%f, y=%f    dX=%f, dY=%f\n", x, y, dX, dY);
     if(mouseButtonPressed == GLUT_LEFT_BUTTON){
         if(selectedJointId < 0){
             // translation
-            translateX += eX;
-            translateY += eY;
-            translateZ += eZ;
+            translateAmount += mouseDelta;
         } else {
             Vector3f currentPosition = kinematics->path_[selectedJointId].pos();
-            Vector3f newPosition = currentPosition + Vector3f(eX, eY, eZ);
+            Vector3f newPosition = currentPosition + mouseDelta;
             kinematics->solveIK(&(kinematics->path_[selectedJointId]), newPosition);
             updateSkeletonJointPositions();
         }
     } else if (mouseButtonPressed == GLUT_RIGHT_BUTTON) {
         // right button is rotation
-        int windowHeight = glutGet(GLUT_WINDOW_HEIGHT);
-        int windowWidth = glutGet(GLUT_WINDOW_WIDTH);
 
-        rotateAboutY += mouseX - windowPreviousX;
-        rotateAboutX -= mouseY - windowPreviousY;
+        rotateAmount += windowCurrent - windowPrevious;
     }
-    mousePreviousX = x;
-    mousePreviousY = y;
-    mousePreviousZ = z;
-
-    windowPreviousX = mouseX;
-    windowPreviousY = mouseY;
+    mousePrevious = mouseCurrent;
+    windowPrevious = windowCurrent;
 }
 
 void Scene::updateSkeletonJointPositions(){

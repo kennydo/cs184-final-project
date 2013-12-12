@@ -37,19 +37,23 @@ class Scene {
         GLuint pickBuffer[PICK_BUFFER_SIZE];
         GLenum renderMode; // either GL_RENDER or GL_SELECT
         GLenum mouseButtonPressed;
-        double mouseClickStartX, mouseClickStartY, mouseClickStartZ; // in world coordinates
-        double mousePreviousX, mousePreviousY, mousePreviousZ; // in world coordiantes
-        double windowPreviousX, windowPreviousY; // in screen coordinates
 
-        double translateX, translateY, translateZ; // in world coordinates
-        double rotateAboutX, rotateAboutY;
+        // these are in world coordinates (object)
+        Vector3f mouseClickStart;
+        Vector3f mousePrevious;
+
+        // this is in screen coordinates
+        Vector3f windowPrevious;
+
+        Vector3f translateAmount;
+        Vector3f rotateAmount;
+
         float scaleFactor;
 
         void mouseToWorldCoordinates(int, int, double&, double&, double&);
         MouseToWorldConverter *converter;
-        
+
         Kinematics* kinematics;
-        Vector3f delta;
         ParsedObj* obj;
         Skeleton* skeleton;
 
