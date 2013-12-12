@@ -37,11 +37,11 @@ class Scene {
         GLuint pickBuffer[PICK_BUFFER_SIZE];
         GLenum renderMode; // either GL_RENDER or GL_SELECT
         GLenum mouseButtonPressed;
-        double mouseClickStartX, mouseClickStartY; // in world coordinates
-        double mousePreviousX, mousePreviousY; // in world coordiantes
+        double mouseClickStartX, mouseClickStartY, mouseClickStartZ; // in world coordinates
+        double mousePreviousX, mousePreviousY, mousePreviousZ; // in world coordiantes
         double windowPreviousX, windowPreviousY; // in screen coordinates
 
-        double translateX, translateY; // in world coordinates
+        double translateX, translateY, translateZ; // in world coordinates
         double rotateAboutX, rotateAboutY;
         float scaleFactor;
 

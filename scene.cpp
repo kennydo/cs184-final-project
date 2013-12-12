@@ -9,6 +9,7 @@ Scene::Scene(ParsedObj* o, Skeleton* s, Kinematics* k){
     mouseButtonPressed = 0;
     translateX = 0;
     translateY = 0;
+    translateZ = 0;
     rotateAboutX = 0;
     rotateAboutY = 0;
     scaleFactor = 1.0;
@@ -16,6 +17,7 @@ Scene::Scene(ParsedObj* o, Skeleton* s, Kinematics* k){
 
     mousePreviousX = 0;
     mousePreviousY = 0;
+    mousePreviousZ = 0;
     windowPreviousX = 0;
     windowPreviousY = 0;
     delta = Vector3f(0, 0, 0);
@@ -49,6 +51,7 @@ void Scene::refreshCamera(int mouseX, int mouseY){
     glScalef(0.05, 0.05, 0.05);
     glRotatef(rotateAboutX, 1, 0, 0);
     glRotatef(rotateAboutY, 0, 1, 0);
+    glTranslatef(translateX, translateY , translateZ);
 
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
@@ -76,9 +79,8 @@ void Scene::refreshCamera(int mouseX, int mouseY){
     // we'll probably want to not be using ortho projection
     glOrtho(-1 * xAmount, xAmount,
             -1 * yAmount, yAmount,
-            -1.0, 1.0);
+            -1, 1);
     glScalef(scaleFactor, scaleFactor, scaleFactor);
-    glTranslatef(translateX * 0.05, translateY * 0.05, 0);
 }
 
 void Scene::draw(){
@@ -258,9 +260,11 @@ void Scene::onLeftClick(int mouseX, int mouseY) {
     converter->convert(mouseX, mouseY, x, y, z);
     mouseClickStartX = x;
     mouseClickStartY = y;
+    mouseClickStartZ = z;
     mousePreviousX = mouseClickStartX;
     mousePreviousY = mouseClickStartY;
-    printf("Scene::onLeftClick called with x=%f, y=%f\n", x, y);
+    mousePreviousZ = mouseClickStartZ;
+    printf("Scene::onLeftClick called with x=%f, y=%f, z=%f\n", x, y, z);
     mouseButtonPressed = GLUT_LEFT_BUTTON;
     GLint numHits;
 
@@ -306,7 +310,7 @@ void Scene::onLeftClick(int mouseX, int mouseY) {
 void Scene::onLeftRelease(int mouseX, int mouseY) {
     double x, y, z;
     converter->convert(mouseX, mouseY, x, y, z);
-    //printf("Scene::onLeftRelease called with x=%f, y=%f\n", x, y);
+    printf("Scene::onLeftRelease called with x=%f, y=%f, z=%f\n", x, y, z);
     mouseButtonPressed = 0;
 }
 
@@ -338,6 +342,7 @@ void Scene::onMouseMotion(int mouseX, int mouseY) {
 
     double eX = x - mousePreviousX;
     double eY = y - mousePreviousY;
+    double eZ = z - mousePreviousZ;
 
     //printf("Scene::onMouseMotion called with x=%f, y=%f    dX=%f, dY=%f\n", x, y, dX, dY);
     if(mouseButtonPressed == GLUT_LEFT_BUTTON){
@@ -345,6 +350,7 @@ void Scene::onMouseMotion(int mouseX, int mouseY) {
             // translation
             translateX += eX;
             translateY += eY;
+            translateZ += eZ;
         } else {
             printf("Trying to move to (%f, %f, %f)\n",
                    position.x(), position.y(), position.z());
@@ -361,6 +367,7 @@ void Scene::onMouseMotion(int mouseX, int mouseY) {
     }
     mousePreviousX = x;
     mousePreviousY = y;
+    mousePreviousZ = z;
 
     windowPreviousX = mouseX;
     windowPreviousY = mouseY;
@@ -387,7 +394,7 @@ MouseToWorldConverter::MouseToWorldConverter(){
 }
 
 void MouseToWorldConverter::convert(int mouseX, int mouseY, double& objX, double& objY, double& objZ) {
-    gluUnProject(mouseX, mouseY, 0,
+    gluUnProject(mouseX, mouseY, 1,
                  modelViewMatrix, projectionMatrix, viewport,
                  &objX, &objY, &objZ);
 }
