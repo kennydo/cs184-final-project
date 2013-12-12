@@ -296,7 +296,7 @@ void Scene::onMouseMotion(int mouseX, int mouseY) {
     double eY = y - mousePreviousY;
 
     //printf("Scene::onMouseMotion called with x=%f, y=%f    dX=%f, dY=%f\n", x, y, dX, dY);
-    if(mouseButtonPressed == GLUT_LEFT_BUTTON){
+    if(selectedJointId < 0 && mouseButtonPressed == GLUT_LEFT_BUTTON){
         // left button is translation
         translateX += eX;
         translateY += eY;
