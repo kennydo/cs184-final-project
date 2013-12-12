@@ -214,6 +214,22 @@ void Scene::moveTestSkeleton(float x, float y, float z) {
     kinematics->solveIK(&(kinematics->path_[2]), delta);
 }
 
+void Scene::moveJoint(Vector3f direction){
+    /* we normalize the direction passed in,
+     * so don't depend on its magnitude staying the same
+     */
+    if(selectedJointId < 0){
+        return;
+    }
+    direction.normalize();
+
+    Vector3f currentPosition = kinematics->path_[selectedJointId].pos();
+    Vector3f newPosition = currentPosition + direction/5;
+
+    kinematics->solveIK(&(kinematics->path_[selectedJointId]), newPosition);
+    updateSkeletonJointPositions();
+}
+
 void Scene::onLeftClick(int mouseX, int mouseY) {
     /*
      * the x and y are where the click happened, where
@@ -319,9 +335,7 @@ void Scene::onMouseMotion(int mouseX, int mouseY) {
             printf("Trying to move to (%f, %f, %f)\n",
                    position.x(), position.y(), position.z());
             kinematics->solveIK(&(kinematics->path_[selectedJointId]), position);
-            for(int i=0; i < int(kinematics->path_.size()); i++){
-                skeleton->joints[i]->updateLink(kinematics->path_[i]);
-            }
+            updateSkeletonJointPositions();
         }
     } else if (mouseButtonPressed == GLUT_RIGHT_BUTTON) {
         // right button is rotation
@@ -336,6 +350,12 @@ void Scene::onMouseMotion(int mouseX, int mouseY) {
 
     windowPreviousX = mouseX;
     windowPreviousY = mouseY;
+}
+
+void Scene::updateSkeletonJointPositions(){
+    for(int i=0; i < int(kinematics->path_.size()); i++){
+        skeleton->joints[i]->updateLink(kinematics->path_[i]);
+    }
 }
 
 void Scene::onZoomIn(){

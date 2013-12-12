@@ -55,6 +55,8 @@ class Scene {
 
         int selectedJointId;
         float hitZ;
+
+        void updateSkeletonJointPositions();
     public:
         Scene(ParsedObj*, Skeleton*, Kinematics*);
 
@@ -69,6 +71,8 @@ class Scene {
 
         void rotateTestSkeleton(Quaternionf);
         void moveTestSkeleton(float x, float y, float z);
+
+        void moveJoint(Vector3f direction);
 
         void onMouseMotion(int, int);
         void onLeftClick(int, int);
