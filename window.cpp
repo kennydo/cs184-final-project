@@ -74,36 +74,45 @@ void Window::keyboard(unsigned char key, int x, int y) {
         case 'w':
         {
             printf("rotate joint clockwise around x axis\n");
-            Quaternionf q(sqrt(0.5), sqrt(0.5), 0, 0);
-            //Quaternionf q(sqrt(0.5), 0, sqrt(0.5), 0);
-            //Quaternionf q(-sqrt(0.5), 0, 0, sqrt(0.5));
+            Quaternionf q(-sqrt(0.5), sqrt(0.5), 0, 0);
             scene->rotateTestSkeleton(q);
         }
             break;
         case 's':
         {
             printf("rotate joint counterclockwise around x axis\n");
-            Quaternionf q(-sqrt(0.5), sqrt(0.5), 0, 0);
-            //Quaternionf q(sqrt(0.5), 0, sqrt(0.5), 0);
-            //Quaternionf q(sqrt(0.5), 0, 0, sqrt(0.5));
+            Quaternionf q(sqrt(0.5), sqrt(0.5), 0, 0);
             scene->rotateTestSkeleton(q);
+
         }
             break;
         case 'a':
         {
             printf("rotate joint clockwise around z axis\n");
-            Quaternionf q(sqrt(0.5), 0, 0, sqrt(0.5));
+            Quaternionf q(-sqrt(0.5), 0, 0, sqrt(0.5));
             scene->rotateTestSkeleton(q);
         }
             break;
         case 'd':
         {
             printf("rotate joint counterclockwise around z axis\n");
-            Quaternionf q(-sqrt(0.5), 0, 0, sqrt(0.5));
+
+            Quaternionf q(sqrt(0.5), 0, 0, sqrt(0.5));
             scene->rotateTestSkeleton(q);
         } 
             break;
-            
+        case 'z':
+        {
+            printf("moving joint forward\n");
+            scene->moveSkeleton(0.0f, 0.0f, 1.0f);
+        }
+            break;
+        case 'x':
+        {
+            printf("moving joint backward\n");
+            scene->moveSkeleton(0.0f, 0.0f, -1.0f);
+        }
+            break;
         case ' ':
             printf("quitting\n");
             exit(0);
