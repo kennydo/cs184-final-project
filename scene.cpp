@@ -298,6 +298,9 @@ void Scene::onMouseMotion(int mouseX, int mouseY) {
             printf("Trying to move to (%f, %f, %f)\n",
                    position.x(), position.y(), position.z());
             kinematics->solveIK(&(kinematics->path_[selectedJointId]), position);
+            for(int i=0; i < int(kinematics->path_.size()); i++){
+                skeleton->joints[i]->updateLink(kinematics->path_[i]);
+            }
         }
     } else if (mouseButtonPressed == GLUT_RIGHT_BUTTON) {
         // right button is rotation
