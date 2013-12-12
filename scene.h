@@ -52,6 +52,7 @@ class Scene {
         Skeleton* skeleton;
 
         int selectedJointId;
+        float hitZ;
     public:
         Scene(ParsedObj*, Skeleton*, Kinematics*);
 

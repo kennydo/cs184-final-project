@@ -250,8 +250,11 @@ void Scene::onLeftClick(int mouseX, int mouseY) {
     numItems = pickBuffer[0];
     zMin = pickBuffer[1] / (pow(2.0, 32.0) - 1.0);
     zMax = pickBuffer[2] / (pow(2.0, 32.0) - 1.0);
+
+    hitZ = (zMax + zMin) / 2.0;
     printf("numItems: %d\nzMin: %f\nzMax: %f\n",
            numItems, zMin, zMax);
+    printf("Setting hitZ: %f\n", hitZ);
     for(unsigned int j=0; j<numItems; j++){
         item = pickBuffer[3 + j];
         printf("item: %d\n", item);
@@ -277,7 +280,7 @@ void Scene::onMouseMotion(int mouseX, int mouseY) {
 
     double x, y, z;
     converter->convert(mouseX, mouseY, x, y, z);
-    Eigen::Vector3f position = Eigen::Vector3f(x,y,z);
+    Eigen::Vector3f position = Eigen::Vector3f(x,y, hitZ);
 
     //double dX = x - mouseClickStartX;
     //double dY = y - mouseClickStartY;
