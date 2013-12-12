@@ -75,28 +75,30 @@ void Window::keyboard(unsigned char key, int x, int y) {
         {
             printf("rotate joint clockwise around x axis\n");
             Quaternionf q(-sqrt(0.5), sqrt(0.5), 0, 0);
-            scene->rotateSkeleton(q);
+            scene->rotateTestSkeleton(q);
         }
             break;
         case 's':
         {
             printf("rotate joint counterclockwise around x axis\n");
             Quaternionf q(sqrt(0.5), sqrt(0.5), 0, 0);
-            scene->rotateSkeleton(q);
+            scene->rotateTestSkeleton(q);
+
         }
             break;
         case 'a':
         {
             printf("rotate joint clockwise around z axis\n");
             Quaternionf q(-sqrt(0.5), 0, 0, sqrt(0.5));
-            scene->rotateSkeleton(q);
+            scene->rotateTestSkeleton(q);
         }
             break;
         case 'd':
         {
             printf("rotate joint counterclockwise around z axis\n");
+
             Quaternionf q(sqrt(0.5), 0, 0, sqrt(0.5));
-            scene->rotateSkeleton(q);
+            scene->rotateTestSkeleton(q);
         } 
             break;
         case 'z':
@@ -122,19 +124,19 @@ void Window::specialKeys(int key, int x, int y) {
     switch(key) {
         case GLUT_KEY_UP:
             printf("moving joint up\n");
-            scene->moveSkeleton(0.0f, 1.0f, 0.0f);
+            scene->moveTestSkeleton(0.0f, 1.0f, 0.0f);
             break;
         case GLUT_KEY_DOWN:
             printf("moving joint down\n");
-            scene->moveSkeleton(0.0f, -1.0f, 0.0f);
+            scene->moveTestSkeleton(0.0f, -1.0f, 0.0f);
             break;
         case GLUT_KEY_LEFT:
             printf("moving joint left\n");
-            scene->moveSkeleton(-1.0f, 0.0f, 0.0f);
+            scene->moveTestSkeleton(-1.0f, 0.0f, 0.0f);
             break;
         case GLUT_KEY_RIGHT:
             printf("moving joint right\n");
-            scene->moveSkeleton(1.0f, 0.0f, 0.0f);
+            scene->moveTestSkeleton(1.0f, 0.0f, 0.0f);
             break;
     }
 }
