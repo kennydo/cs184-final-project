@@ -17,6 +17,9 @@ class Skeleton {
 
         std::vector<Link*> joints;
         std::vector<Link*> parents;
+
+        void offset(Eigen::Vector3f);
+        void scale(float);
 };
 
 #endif

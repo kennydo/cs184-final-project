@@ -58,3 +58,28 @@ Skeleton* Skeleton::parse(std::string filename){
 
     return skeleton;
 }
+
+void Skeleton::offset(Eigen::Vector3f offsetAmount){
+    Link* joint;
+    Eigen::Vector3f currentPosition;
+    for(int i=0; i < joints.size() ; i++){
+        joint = joints[i];
+
+        currentPosition = joint->pos();
+        joint->moveJoint(currentPosition + offsetAmount);
+    }
+}
+
+void Skeleton::scale(float scale){
+    Link* joint;
+    Eigen::Vector3f currentPosition;
+    float currentLength;
+    for(int i=0; i < joints.size(); i++){
+        joint = joints[i];
+        currentPosition = joint->pos();
+        currentLength = joint->getLength();
+
+        joint->moveJoint(currentPosition * scale);
+        joint->setLength(currentLength * scale);
+    }
+}

@@ -10,7 +10,10 @@ void ParsedObj::centerAndScale(float s){
     /* centers the obj's vertices about the origin
      * and then scales them so that the furthest vertex
      * has a distance of 's' from the origin */
-    if(vertices.size() < 1){ return; }
+    if(vertices.size() < 1){
+        printf("Invalid number of vertices: %f\n", vertices.size());
+        return;
+    }
 
     Eigen::Vector3f minVertex = *vertices[0];
     Eigen::Vector3f maxVertex = *vertices[0];
@@ -72,7 +75,6 @@ ParsedObj* ObjParser::parse(std::string filename){
     ParsedObj* obj = new ParsedObj();
 
     std::string line;
-    std::stringstream lineStream;
     std::ifstream objFile (filename.c_str());
 
     std::string op;
@@ -84,7 +86,7 @@ ParsedObj* ObjParser::parse(std::string filename){
             if(line.empty()){
                 continue;
             }
-
+            std::stringstream lineStream;
             lineStream << line;
 
             lineStream >> op;

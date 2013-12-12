@@ -24,7 +24,15 @@ int main(int argc, char* argv[])
     if(argc >= 2){
         printf("Attempting to parse obj file input\n");
         obj = ObjParser::parse(argv[1]);
+
+        printf("Centering and scaling obj\n");
         obj->centerAndScale(3.0);
+        printf("Centering obj by: %f, %f, %f\n",
+                obj->center.x(),
+                obj->center.y(),
+                obj->center.z());
+        printf("Scaling obj by: %f\n", obj->scale);
+
         printf("Completed parsing\n");
     } else {
         printf("No .obj file passed in\n");
@@ -34,6 +42,14 @@ int main(int argc, char* argv[])
         printf("Attempting to parse skeleton file input\n");
         skeleton = Skeleton::parse(argv[2]);
         printf("Completed parsing\n");
+
+        Eigen::Vector3f offset = -1 * obj->center;
+        printf("Centering by (%f, %f, %f)\n", offset.x(), offset.y(), offset.z());
+        skeleton->offset(-1 * obj->center);
+
+        float scale = obj->scale;
+        printf("Scaling by %f\n", scale);
+        skeleton->scale(obj->scale);
     } else {
         printf("No skeleton file passed in\n");
     }
@@ -44,7 +60,7 @@ int main(int argc, char* argv[])
     Vector3f p1 ( 0.0, 4.0, 0.0 );
     Vector3f p2 ( 4.0, 4.0, 0.0 );
     Vector3f p3 ( 4.0, 2.0, 0.0 );
-    
+
     Quaternionf q1(1, 0, 0, 0);
     //Quaternionf q2(1, 0, 0, 0);
     //Quaternionf q2(sqrt(0.5), sqrt(0.5), 0, 0);

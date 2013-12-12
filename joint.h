@@ -33,6 +33,7 @@ public:
     Quaternionf getAngle() { return angle_; }
     
     void moveJoint(Vector3f pos) { pos_ = pos; }
+    void setLength(float length) { length_ = length; }
     void updateAngle(Quaternionf angle) { angle_ = angle; }
     
     void updateLink(Link link) {
