@@ -8,7 +8,6 @@ Skeleton* Skeleton::parse(std::string filename){
     Skeleton* skeleton = new Skeleton();
 
     std::string line;
-    std::stringstream lineStream;
     std::ifstream skeletonFile (filename.c_str());
     Eigen::Vector3f position, parentPosition;
 
@@ -25,10 +24,10 @@ Skeleton* Skeleton::parse(std::string filename){
             if(line.empty()){
                 continue;
             }
+            std::stringstream lineStream;
 
             lineStream << line;
             lineStream >> id >> x >> y >> z >> parent;
-
             assert(id == int(skeleton->joints.size()));
 
             position = Eigen::Vector3f(x, y, z);

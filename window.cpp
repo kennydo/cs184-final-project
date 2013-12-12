@@ -104,13 +104,13 @@ void Window::keyboard(unsigned char key, int x, int y) {
         case 'z':
         {
             printf("moving joint forward\n");
-            scene->moveSkeleton(0.0f, 0.0f, 1.0f);
+            scene->moveTestSkeleton(0.0f, 0.0f, 1.0f);
         }
             break;
         case 'x':
         {
             printf("moving joint backward\n");
-            scene->moveSkeleton(0.0f, 0.0f, -1.0f);
+            scene->moveTestSkeleton(0.0f, 0.0f, -1.0f);
         }
             break;
         case ' ':
