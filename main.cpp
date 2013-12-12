@@ -43,13 +43,13 @@ int main(int argc, char* argv[])
         skeleton = Skeleton::parse(argv[2]);
         printf("Completed parsing\n");
 
-        Eigen::Vector3f offset = -1 * obj->center;
-        printf("Centering by (%f, %f, %f)\n", offset.x(), offset.y(), offset.z());
-        skeleton->offset(-1 * obj->center);
+        //Eigen::Vector3f offset = -1 * obj->center;
+        //printf("Centering by (%f, %f, %f)\n", offset.x(), offset.y(), offset.z());
+        //skeleton->offset(-1 * obj->center);
 
-        float scale = obj->scale;
-        printf("Scaling by %f\n", scale);
-        skeleton->scale(obj->scale);
+        //float scale = obj->scale;
+        //printf("Scaling by %f\n", scale);
+        //skeleton->scale(obj->scale);
     } else {
         printf("No skeleton file passed in\n");
     }
@@ -82,6 +82,18 @@ int main(int argc, char* argv[])
     vector<Link> path;
     for(int i=0; i < int(skeleton->joints.size()); i++){
         path.push_back(* (skeleton->joints[i]));
+    }
+
+    printf("Printing path\n");
+    for(int i=0; i < int(path.size()); i++){
+        Vector3f position = path[i].pos();
+        printf("Link at (%f, %f, %f)\n", position.x(), position.y(), position.z());
+        printf("Innerlink: %d\n", path[i].getInnerLink());
+        vector<int> outerLinks = path[i].getOuterLinks();
+        printf("Outerlinks:\n");
+        for(int j=0; j < int(outerLinks.size()); j++){
+            printf("\t%d\n", outerLinks[j]);
+        }
     }
 
     Kinematics*  kinematics = new Kinematics(origin, path);
