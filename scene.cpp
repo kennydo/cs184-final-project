@@ -89,27 +89,28 @@ void Scene::draw(){
 }
 
 void Scene::drawGrid() {
-    
-    glPushAttrib(GL_ENABLE_BIT); 
-    
+    glPushAttrib(GL_ENABLE_BIT);
+
     glLineStipple(1, 0xAAAA);
     glEnable(GL_LINE_STIPPLE);
-    glColor3f(0.0, 0.0, 1.0);
+    glColor3f(1.0, 0.0, 0.0);
     glBegin(GL_LINES);
-    glVertex3f(-100, 0, 0);
+    glVertex3f(0, 0, 0);
     glVertex3f(100, 0, 0);
     glEnd();
-    
+
     glBegin(GL_LINES);
-    glVertex3f(0, -100, 0);
+    glColor3f(0.0, 1.0, 0.0);
+    glVertex3f(0, 0, 0);
     glVertex3f(0, 100, 0);
     glEnd();
-    
+
     glBegin(GL_LINES);
-    glVertex3f(0, 0, -100);
+    glColor3f(0.0, 0.0, 1.0);
+    glVertex3f(0, 0, 0);
     glVertex3f(0, 0, 100);
     glEnd();
-    
+
     glPopAttrib();
 }
 
