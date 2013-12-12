@@ -40,6 +40,7 @@ void Scene::refreshCamera(int mouseX, int mouseY){
     glScalef(0.05, 0.05, 0.05);
     glRotatef(rotateAmount.y(), -1, 0, 0);
     glRotatef(rotateAmount.x(), 0, 1, 0);
+    glRotatef(180, 0, 1, 0);
     glTranslatef(translateAmount.x(), translateAmount.y(), translateAmount.z());
 
     glMatrixMode(GL_PROJECTION);
