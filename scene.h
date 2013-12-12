@@ -16,6 +16,7 @@
 #include "joint.h"
 #include "kinematics.h"
 #include "objparser.h"
+#include "skeleton.h"
 
 // picking tolerance in pixels
 #define PICK_TOLERANCE 10
@@ -49,8 +50,9 @@ class Scene {
         int endEffector;
         Vector3f delta;
         ParsedObj* obj;
+        Skeleton* skeleton;
     public:
-        Scene(ParsedObj*);
+        Scene(ParsedObj*, Skeleton*);
         
         void addKinematics(Kinematics);
         void addEndEffector(int);
@@ -60,11 +62,11 @@ class Scene {
 
         void drawGrid();
         void drawLink(Link);
-        void drawSkeleton();
+        void drawTestSkeleton();
         void drawObj();
 
-        void rotateSkeleton(Quaternionf);
-        void moveSkeleton(float x, float y, float z);
+        void rotateTestSkeleton(Quaternionf);
+        void moveTestSkeleton(float x, float y, float z);
 
         void onMouseMotion(int, int);
         void onLeftClick(int, int);

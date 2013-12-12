@@ -29,8 +29,16 @@ int main(int argc, char* argv[])
     } else {
         printf("No .obj file passed in\n");
     }
+    Skeleton* skeleton = NULL;
+    if(argc >= 3){
+        printf("Attempting to parse skeleton file input\n");
+        skeleton = Skeleton::parse(argv[2]);
+        printf("Completed parsing\n");
+    } else {
+        printf("No skeleton file passed in\n");
+    }
 
-    Scene* scene = new Scene(obj);
+    Scene* scene = new Scene(obj, skeleton);
     
     Vector3f origin ( 0.0, 0.0, 0.0 );
     Vector3f p1 ( 0.0, 4.0, 0.0 );

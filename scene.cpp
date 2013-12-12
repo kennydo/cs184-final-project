@@ -3,7 +3,7 @@
 #include <iostream>
 #include <cmath>
 
-Scene::Scene(ParsedObj* o){
+Scene::Scene(ParsedObj* o, Skeleton* s){
     // initialize variables
     renderMode = GL_RENDER;
     mouseButtonPressed = 0;
@@ -20,6 +20,11 @@ Scene::Scene(ParsedObj* o){
         obj = NULL;
     } else {
         obj = o;
+    }
+    if(s == NULL){
+        skeleton = NULL;
+    } else {
+        skeleton = s;
     }
 
     // When the scene is initialized the GL params aren't
@@ -74,7 +79,7 @@ void Scene::draw(){
     glInitNames();
     glPushName(0);
     glLoadName(67); // a distinct-looking name for debugging purposes
-    drawSkeleton();
+    drawTestSkeleton();
     if(obj != NULL){
         drawObj();
     }
@@ -107,7 +112,7 @@ void Scene::drawGrid() {
     glPopAttrib();
 }
 
-void Scene::drawSkeleton() {
+void Scene::drawTestSkeleton() {
     Vector3f p1, p2;
     Link link;
     
@@ -135,7 +140,7 @@ void Scene::drawSkeleton() {
     
 }
 
-void Scene::rotateSkeleton(Quaternionf q) {
+void Scene::rotateTestSkeleton(Quaternionf q) {
         //float theta = f*3.14159/180;
     k.solveFK(k.path_[0], q);
 }
@@ -164,7 +169,7 @@ void Scene::drawObj(){
 
 // Moves the skeleton up and down, obviously this is poorly named..
 // we'll work on that.
-void Scene::moveSkeleton(float x, float y, float z) {
+void Scene::moveTestSkeleton(float x, float y, float z) {
     // IK can only solve for the end effector, so we want to find the last
     // element and move it.
     /*delta.x() += x;
