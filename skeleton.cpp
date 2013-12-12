@@ -1,7 +1,6 @@
 #include "skeleton.h"
 
 Skeleton::Skeleton(){
-
 }
 
 Skeleton* Skeleton::parse(std::string filename){
@@ -43,7 +42,9 @@ Skeleton* Skeleton::parse(std::string filename){
             }
             Link* joint = new Link(length, position, identityQuaternion);
             skeleton->joints.push_back(joint);
+            skeleton->endEffectorIds.insert(id);
             if(parent >= 0){
+                skeleton->endEffectorIds.erase(parent);
                 // add the inner and outer links
                 skeleton->joints[parent]->addOuterLink(id);
                 joint->addInnerLink(parent);
@@ -55,7 +56,11 @@ Skeleton* Skeleton::parse(std::string filename){
     } else {
         printf("Unable to open file '%s'\n", filename.c_str());
     }
-
+    printf("Got the following endEffectorIds:\n");
+    for(std::set<int>::iterator it=skeleton->endEffectorIds.begin(); it!=skeleton->endEffectorIds.end(); ++it){
+        int id = *it;
+        printf("\t%d\n", id);
+    }
     return skeleton;
 }
 

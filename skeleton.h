@@ -7,6 +7,7 @@
 #include <iostream>
 #include <fstream>
 #include "joint.h"
+#include <set>
 #include <string>
 #include <vector>
 
@@ -15,6 +16,7 @@ class Skeleton {
         Skeleton();
         static Skeleton* parse(std::string);
 
+        std::set<int> endEffectorIds;
         std::vector<Link*> joints;
         std::vector<Link*> parents;
 
