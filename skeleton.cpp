@@ -88,3 +88,7 @@ void Skeleton::scale(float scale){
         joint->setLength(currentLength * scale);
     }
 }
+
+bool Skeleton::isEndEffector(int id){
+    return endEffectorIds.find(id) != endEffectorIds.end();
+}

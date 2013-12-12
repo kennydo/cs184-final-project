@@ -47,7 +47,6 @@ class Scene {
         MouseToWorldConverter *converter;
         
         Kinematics k;
-        int endEffector;
         Vector3f delta;
         ParsedObj* obj;
         Skeleton* skeleton;
@@ -57,7 +56,6 @@ class Scene {
         Scene(ParsedObj*, Skeleton*);
         
         void addKinematics(Kinematics);
-        void addEndEffector(int);
 
         void refreshCamera(int, int);
         void draw();

@@ -82,13 +82,12 @@ int main(int argc, char* argv[])
     l3.addInnerLink(1);
     
     vector<Link> path;
-    path.push_back(l1);
-    path.push_back(l2);
-    path.push_back(l3);
+    for(int i=0; i < int(skeleton->joints.size()); i++){
+        path.push_back(* (skeleton->joints[i]));
+    }
 
     Kinematics k = Kinematics(origin, path);
     scene->addKinematics(k);
-    scene->addEndEffector(2);
 
     glutInit(&argc, argv);
 

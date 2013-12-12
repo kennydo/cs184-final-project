@@ -37,10 +37,6 @@ void Scene::addKinematics(Kinematics kinematics) {
     k = kinematics;
 }
 
-void Scene::addEndEffector(int i) {
-    endEffector = i;
-}
-
 void Scene::refreshCamera(int mouseX, int mouseY){
     // the x and y are where the click happened.
     // when the renderMode isn't GL_SELECT, those values aren't used for anything
@@ -220,7 +216,7 @@ void Scene::moveTestSkeleton(float x, float y, float z) {
     delta.z() += z;
     
     cout << "TARGET POSITION\n" << delta << endl;
-    k.solveIK(&(k.path_[endEffector]), delta);
+    //k.solveIK(&(k.path_[endEffector]), delta);
 }
 
 void Scene::onLeftClick(int mouseX, int mouseY) {
@@ -270,7 +266,11 @@ void Scene::onLeftClick(int mouseX, int mouseY) {
     for(unsigned int j=0; j<numItems; j++){
         item = pickBuffer[3 + j];
         printf("item: %d\n", item);
-        selectedJointId = item;
+        if(skeleton->isEndEffector(item)){
+            selectedJointId = item;
+        } else {
+            printf("Clicked joint %d, but it's not end effector\n", item);
+        }
     }
     printf("\n");
 }

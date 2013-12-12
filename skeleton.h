@@ -22,6 +22,8 @@ class Skeleton {
 
         void offset(Eigen::Vector3f);
         void scale(float);
+
+        bool isEndEffector(int);
 };
 
 #endif
